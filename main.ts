@@ -6,4 +6,5 @@ app.use(ctx => {
   ctx.response.body = 'Hello world';
 });
 
-await app.listen({ port: 8081 });
+const port = Deno.env.get('PORT');
+await app.listen({ port: port ? parseInt(port, 10) : 8081 });
