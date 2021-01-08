@@ -51,6 +51,15 @@ router.post('/api/settings', async (context) => {
 });
 
 const app = new Application();
+app.use(async (context, next) => {
+  const origin = Deno.env.get('FRONTEND_ORIGIN');
+  if (origin) {
+    // Add CORS headers
+    context.response.headers.append('Access-Control-Allow-Origin', origin);
+    context.response.headers.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  }
+  await next();
+});
 app.use(router.routes());
 app.use(router.allowedMethods());
 const port = Deno.env.get('PORT');
