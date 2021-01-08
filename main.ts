@@ -1,4 +1,4 @@
-import "https://deno.land/x/dotenv@v1.0.1/load.ts";
+import 'https://deno.land/x/dotenv@v1.0.1/load.ts';
 import { Application, Router } from 'https://deno.land/x/oak@v6.4.1/mod.ts';
 import { getDb } from './db.ts';
 import { Partner, Settings, SkippedDay } from './dbTypes.ts';
