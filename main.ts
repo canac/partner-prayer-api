@@ -52,6 +52,14 @@ router.post('/api/settings', async (context) => {
 
 const app = new Application();
 app.use(async (context, next) => {
+  try {
+    await next();
+  } catch (err) {
+    context.response.status = 500;
+    context.response.body = err.message;
+  }
+});
+app.use(async (context, next) => {
   const origin = Deno.env.get('FRONTEND_ORIGIN');
   if (origin) {
     // Add CORS headers
