@@ -1,19 +1,15 @@
 import 'https://deno.land/x/dotenv@v1.0.1/load.ts';
 import { Application, Router, helpers } from 'https://deno.land/x/oak@v6.4.1/mod.ts';
 import { endOfMonth, isValid, parseISO, startOfMonth } from 'https://cdn.skypack.dev/date-fns@2.16.1';
-import { getDb } from './db.ts';
-import { Partner, Settings, SkippedDay } from './dbTypes.ts';
+import { getDb } from './db/db.ts';
+import { Settings, SkippedDay } from './db/types.ts';
+import { getPartnerNames } from './db/partners.ts';
 import { generateSchedule } from './schedule.ts';
 
 const router = new Router();
 
 router.get('/api/partners', async (context) => {
-  const db = await getDb();
-
-  const partnerDocs: Partner[] = await db.collection<Partner>('partners').find().toArray();
-  const partners = partnerDocs.map((partner: Partner) => partner.name);
-
-  context.response.body = partners;
+  context.response.body = await getPartnerNames();
 });
 
 router.get('/api/schedule', async (context) => {
@@ -31,10 +27,7 @@ router.get('/api/schedule', async (context) => {
     isSkipped: true,
   }).toArray();
 
-  const partnerDocs: Partner[] = await db.collection<Partner>('partners').find().toArray();
-  const partners = partnerDocs.map((partner: Partner) => partner.name);
-
-  context.response.body = generateSchedule(month, skippedDayDocs.map(day => day.date), partners);
+  context.response.body = generateSchedule(month, skippedDayDocs.map(day => day.date), await getPartnerNames());
 });
 
 router.get('/api/settings', async (context) => {
