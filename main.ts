@@ -3,14 +3,15 @@ import { Application, Router, helpers } from 'https://deno.land/x/oak@v6.4.1/mod
 import { isValid, parseISO } from 'https://cdn.skypack.dev/date-fns@2.16.1';
 import { getDb } from './db/db.ts';
 import { Settings, SkippedDay } from './db/types.ts';
-import { getPartnerNames } from './db/partners.ts';
+import { getPartners } from './db/partners.ts';
 import { getMonthSkippedDays } from './db/skippedDays.ts';
 import { generateSchedule } from './schedule.ts';
 
 const router = new Router();
 
 router.get('/api/partners', async (context) => {
-  context.response.body = await getPartnerNames();
+  const partners = await getPartners();
+  context.response.body = partners.map(({ firstName, lastName }) => `${firstName} ${lastName}`);
 });
 
 router.get('/api/schedule', async (context) => {
@@ -19,8 +20,10 @@ router.get('/api/schedule', async (context) => {
     context.throw(500, 'Invalid month');
   }
 
-  const [ skippedDays, partners ] = await Promise.all([ getMonthSkippedDays(month), getPartnerNames() ]);
-  context.response.body = generateSchedule(month, skippedDays, partners);
+  const skippedDays = await getMonthSkippedDays(month);
+  const partners = await getPartners();
+  const partnerIds = partners.map(({ _id }) => _id);
+  context.response.body = generateSchedule(month, skippedDays, partnerIds);
 });
 
 router.get('/api/settings', async (context) => {
