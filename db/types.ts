@@ -1,6 +1,7 @@
 export interface Partner {
   _id: { $oid: string };
-  name: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface Settings {
