@@ -18,3 +18,9 @@ export interface SkippedDay {
   date: Date;
   isSkipped: boolean;
 }
+
+export type Schedule = {
+  _id: ObjectId;
+  month: Date;
+  partnersByDay: ObjectId[][];
+}

@@ -4,8 +4,7 @@ import { isValid, parseISO } from 'https://cdn.skypack.dev/date-fns@2.16.1';
 import { getDb } from './db/db.ts';
 import { Settings, SkippedDay } from './db/types.ts';
 import { getPartners } from './db/partners.ts';
-import { getMonthSkippedDays } from './db/skippedDays.ts';
-import { generateSchedule } from './schedule.ts';
+import { getSchedule } from './db/schedule.ts';
 
 const router = new Router();
 
@@ -20,10 +19,7 @@ router.get('/api/schedule', async (context) => {
     context.throw(500, 'Invalid month');
   }
 
-  const skippedDays = await getMonthSkippedDays(month);
-  const partners = await getPartners();
-  const partnerIds = partners.map(({ _id }) => _id);
-  context.response.body = generateSchedule(month, skippedDays, partnerIds);
+  context.response.body = await getSchedule(month);
 });
 
 router.get('/api/settings', async (context) => {
