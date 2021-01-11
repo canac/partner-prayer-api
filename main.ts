@@ -5,6 +5,7 @@ import { getDb } from './db/db.ts';
 import { Settings, SkippedDay } from './db/types.ts';
 import { getPartners } from './db/partners.ts';
 import { getSchedule } from './db/schedule.ts';
+import { setSkippedDayStatus } from './db/skippedDays.ts';
 
 const router = new Router();
 
@@ -20,6 +21,22 @@ router.get('/api/schedule', async (context) => {
   }
 
   context.response.body = await getSchedule(month);
+});
+
+router.put('/api/skippedDay', async (context) => {
+  const body = await context.request.body({ type: 'json' }).value;
+  const date: Date = new Date(body.date);
+  const isSkipped: boolean = body.isSkipped;
+  if (!isValid(date)) {
+    context.throw(500, 'Invalid date');
+  }
+  if (typeof isSkipped !== 'boolean') {
+    context.throw(500, 'isSkipped is not a boolean');
+  }
+
+  await setSkippedDayStatus(date, isSkipped);
+
+  context.response.body = {};
 });
 
 router.get('/api/settings', async (context) => {
