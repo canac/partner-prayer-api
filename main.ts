@@ -10,7 +10,7 @@ const router = new Router();
 
 router.get('/api/partners', async (context) => {
   const partners = await getPartners();
-  context.response.body = partners.map(({ firstName, lastName }) => `${firstName} ${lastName}`);
+  context.response.body = partners;
 });
 
 router.get('/api/schedule', async (context) => {
