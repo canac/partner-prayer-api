@@ -60,6 +60,8 @@ router.post('/api/settings', async (context) => {
 
 const app = new Application();
 app.use(async (context, next) => {
+  console.log(`${context.request.method} ${context.request.url.href}`);
+
   try {
     await next();
   } catch (err) {
