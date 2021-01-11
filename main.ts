@@ -75,6 +75,7 @@ app.use(async (context, next) => {
     // Add CORS headers
     context.response.headers.append('Access-Control-Allow-Origin', origin);
     context.response.headers.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    context.response.headers.append('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   }
   await next();
 });
