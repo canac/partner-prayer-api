@@ -3,11 +3,27 @@ import { Application, Router, helpers } from 'https://deno.land/x/oak@v6.4.1/mod
 import { isValid, parseISO } from 'https://cdn.skypack.dev/date-fns@2.16.1';
 import { getDb } from './db/db.ts';
 import { Settings, SkippedDay } from './db/types.ts';
+import { getLastCompletedDay, setLastCompletedDay } from './db/completedDays.ts';
 import { getPartners } from './db/partners.ts';
 import { getSchedule } from './db/schedule.ts';
 import { setSkippedDayStatus } from './db/skippedDays.ts';
 
 const router = new Router();
+
+router.get('/api/completedDay', async (context) => {
+  context.response.body = { lastCompletedDay: await getLastCompletedDay() };
+});
+
+router.post('/api/completedDay', async (context) => {
+  const body = await context.request.body({ type: 'json' }).value;
+  const lastCompletedDay: Date = new Date(body.lastCompletedDay);
+  if (!isValid(lastCompletedDay)) {
+    context.throw(500, 'Invalid day');
+  }
+
+  await setLastCompletedDay(lastCompletedDay);
+  context.response.body = {};
+});
 
 router.get('/api/partners', async (context) => {
   const partners = await getPartners();
