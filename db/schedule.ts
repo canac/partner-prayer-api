@@ -32,7 +32,7 @@ function calculatePartnersByDay(month: Date, skippedDays: Date[], partnerIds: Ob
 }
 
 // Create or update the schedule for the specified month
-async function generateSchedule(dirtyMonth: Date): Promise<Schedule> {
+export async function generateSchedule(dirtyMonth: Date): Promise<Schedule> {
   const month = startOfMonth(dirtyMonth);
   const db = await getDb();
 
@@ -41,21 +41,20 @@ async function generateSchedule(dirtyMonth: Date): Promise<Schedule> {
   const partners = await getPartners();
   const partnerIds = partners.map(({ _id }) => _id);
   const partnersByDay = calculatePartnersByDay(month, skippedDays, partnerIds);
-  const { upsertedId } = await db.collection<Schedule>('schedule').updateOne(
+  const skippedDayIds = skippedDays.map(day => day.getDate() - 1);
+
+  // findOneAndUpdate would simplify this, but it is not implemented yet
+  await db.collection<Schedule>('schedule').updateOne(
     { month },
-    { $set: { partnersByDay } },
-    { upsert: true }
+    { $set: { partnersByDay, skippedDayIds } },
+    { upsert: true },
   );
 
-  if (!upsertedId) {
-    throw new Error('No schedule was created or updated');
+  const schedule = await db.collection<Schedule>('schedule').findOne({ month });
+  if (!schedule) {
+    throw new Error('Could not find generated schedule');
   }
-
-  return {
-    _id: upsertedId,
-    month,
-    partnersByDay,
-  }
+  return schedule;
 }
 
 // Return the schedule for the specified month

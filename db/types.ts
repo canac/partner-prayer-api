@@ -28,4 +28,5 @@ export type Schedule = {
   _id: ObjectId;
   month: Date;
   partnersByDay: ObjectId[][];
+  skippedDayIds: number[];
 }
