@@ -79,14 +79,6 @@ const app = new Application();
 app.use(async (context, next) => {
   console.log(`${context.request.method} ${context.request.url.href}`);
 
-  try {
-    await next();
-  } catch (err) {
-    context.response.status = 500;
-    context.response.body = err.message;
-  }
-});
-app.use(async (context, next) => {
   const origin = Deno.env.get('FRONTEND_ORIGIN');
   if (origin) {
     // Add CORS headers
@@ -94,7 +86,13 @@ app.use(async (context, next) => {
     context.response.headers.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     context.response.headers.append('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   }
-  await next();
+
+  try {
+    await next();
+  } catch (err) {
+    context.response.status = 500;
+    context.response.body = err.message;
+  }
 });
 app.use(router.routes());
 app.use(router.allowedMethods());
