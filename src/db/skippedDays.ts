@@ -1,6 +1,6 @@
-import { endOfMonth, startOfDay, startOfMonth } from 'https://cdn.skypack.dev/date-fns@2.16.1';
-import { getDb } from './db.ts';
-import { SkippedDay } from './types.ts';
+import { endOfMonth, startOfDay, startOfMonth } from 'date-fns';
+import { getDb } from './db';
+import { SkippedDay } from './types';
 
 // Return an array of the dates in the month that are skipped
 export async function getMonthSkippedDays(month: Date): Promise<Date[]> {

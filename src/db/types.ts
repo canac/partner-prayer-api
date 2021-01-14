@@ -1,6 +1,6 @@
-import { Bson } from 'https://deno.land/x/mongo@v0.20.1/mod.ts';
+import { ObjectId } from 'mongodb';
 
-export type ObjectId = Bson.ObjectId;
+export { ObjectId };
 
 export interface CompletedDay {
   _id: ObjectId;

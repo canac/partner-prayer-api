@@ -1,5 +1,5 @@
-import { getDb } from './db.ts';
-import { Partner } from './types.ts';
+import { getDb } from './db';
+import { Partner } from './types';
 
 // Return an array of the partners
 export async function getPartners(): Promise<Partner[]> {

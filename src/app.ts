@@ -1,10 +1,12 @@
-import 'https://deno.land/x/dotenv@v1.0.1/load.ts';
-import { Application, Router, helpers } from 'https://deno.land/x/oak@v6.4.1/mod.ts';
-import { isValid, parseISO } from 'https://cdn.skypack.dev/date-fns@2.16.1';
-import { getLastCompletedDay, setLastCompletedDay } from './db/completedDays.ts';
-import { getPartners } from './db/partners.ts';
-import { generateSchedule, getSchedule } from './db/schedule.ts';
-import { setSkippedDayStatus } from './db/skippedDays.ts';
+import 'dotenv/config';
+import * as Application from 'koa';
+import * as bodyParser from 'koa-bodyparser';
+import * as Router from 'koa-router';
+import { isValid, parseISO } from 'date-fns';
+import { getLastCompletedDay, setLastCompletedDay } from './db/completedDays';
+import { getPartners } from './db/partners';
+import { generateSchedule, getSchedule } from './db/schedule';
+import { setSkippedDayStatus } from './db/skippedDays';
 
 const router = new Router();
 
@@ -13,7 +15,7 @@ router.get('/api/completedDay', async (context) => {
 });
 
 router.post('/api/completedDay', async (context) => {
-  const body = await context.request.body({ type: 'json' }).value;
+  const body = context.request.body;
   const lastCompletedDay: Date = new Date(body.lastCompletedDay);
   if (!isValid(lastCompletedDay)) {
     context.throw(500, 'Invalid day');
@@ -29,7 +31,7 @@ router.get('/api/partners', async (context) => {
 });
 
 router.get('/api/schedule', async (context) => {
-  const month: Date = parseISO(helpers.getQuery(context).month, {});
+  const month: Date = parseISO(context.request.query.month);
   if (!isValid(month)) {
     context.throw(500, 'Invalid month');
   }
@@ -38,7 +40,7 @@ router.get('/api/schedule', async (context) => {
 });
 
 router.put('/api/schedule/skippedDay', async (context) => {
-  const body = await context.request.body({ type: 'json' }).value;
+  const body = context.request.body;
   const date: Date = new Date(body.date);
   const isSkipped: boolean = body.isSkipped;
   if (!isValid(date)) {
@@ -55,14 +57,14 @@ router.put('/api/schedule/skippedDay', async (context) => {
 
 const app = new Application();
 app.use(async (context, next) => {
-  console.log(`${context.request.method} ${context.request.url.href}`);
+  console.log(`${context.request.method} ${context.request.url}`);
 
-  const origin = Deno.env.get('FRONTEND_ORIGIN');
+  const origin = process.env.FRONTEND_ORIGIN;
   if (origin) {
     // Add CORS headers
-    context.response.headers.append('Access-Control-Allow-Origin', origin);
-    context.response.headers.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    context.response.headers.append('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    context.set('Access-Control-Allow-Origin', origin);
+    context.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    context.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   }
 
   try {
@@ -72,7 +74,8 @@ app.use(async (context, next) => {
     context.response.body = err.message;
   }
 });
+app.use(bodyParser());
 app.use(router.routes());
 app.use(router.allowedMethods());
-const port = Deno.env.get('PORT');
-await app.listen({ port: port ? parseInt(port, 10) : 8081 });
+const port = process.env.PORT;
+app.listen({ port: port ? parseInt(port, 10) : 8081 });

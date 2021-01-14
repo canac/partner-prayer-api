@@ -1,8 +1,8 @@
-import { eachDayOfInterval, endOfMonth, isSameDay, startOfMonth } from 'https://cdn.skypack.dev/date-fns@2.16.1';
-import { getDb } from './db.ts';
-import { ObjectId, Schedule } from './types.ts';
-import { getPartners } from './partners.ts';
-import { getMonthSkippedDays } from './skippedDays.ts';
+import { eachDayOfInterval, endOfMonth, isSameDay, startOfMonth } from 'date-fns';
+import { getDb } from './db';
+import { ObjectId, Schedule } from './types';
+import { getPartners } from './partners';
+import { getMonthSkippedDays } from './skippedDays';
 
 // Return a boolean indicating whether the array of dates contains the specified dates
 function arrayHasDate(haystack: Date[], needle: Date) {
@@ -11,7 +11,7 @@ function arrayHasDate(haystack: Date[], needle: Date) {
 
 // Calculate the prayer partner schedule for the specified date
 function calculatePartnersByDay(month: Date, skippedDays: Date[], partnerIds: ObjectId[]): ObjectId[][] {
-  const daysInMonth: Date[] = eachDayOfInterval({ start: startOfMonth(month), end: endOfMonth(month) }, {});
+  const daysInMonth: Date[] = eachDayOfInterval({ start: startOfMonth(month), end: endOfMonth(month) });
 
   // Count the number of days that are not skipped and will contain partners
   const numDays: number = daysInMonth.filter(day => !arrayHasDate(skippedDays, day)).length;

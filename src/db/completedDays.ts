@@ -1,9 +1,9 @@
-import { getDb } from './db.ts';
-import { CompletedDay } from './types.ts';
+import { getDb } from './db';
+import { CompletedDay } from './types';
 
 export async function getLastCompletedDay(): Promise<Date> {
   const db = await getDb();
-  const completedDayDoc = await db.collection<CompletedDay>('completedDays').findOne();
+  const completedDayDoc = await db.collection<CompletedDay>('completedDays').findOne({});
   return completedDayDoc?.lastCompletedDay || new Date(0);
 }
 
