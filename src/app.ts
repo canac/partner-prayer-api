@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import * as Application from 'koa';
-import * as bodyParser from 'koa-bodyparser';
+import Application from 'koa';
+import bodyParser from 'koa-bodyparser';
 import router from './router';
 
 const app = new Application();

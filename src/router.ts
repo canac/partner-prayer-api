@@ -1,4 +1,4 @@
-import * as Router from 'koa-router';
+import Router from 'koa-router';
 import { isValid, parseISO } from 'date-fns';
 import { getLastCompletedDay, setLastCompletedDay } from './db/completedDays';
 import { getPartners } from './db/partners';
