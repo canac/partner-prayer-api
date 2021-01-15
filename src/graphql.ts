@@ -1,4 +1,4 @@
-import { ApolloServer, gql } from 'apollo-server';
+import { gql } from 'apollo-server';
 import { GraphQLDate } from 'graphql-iso-date';
 import { getLastCompletedDay, setLastCompletedDay } from './db/completedDays';
 import { getPartners } from './db/partners';
@@ -76,7 +76,4 @@ const resolvers = {
   },
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
-server.listen().then(({ url }) => {
-  console.log(`Server running at ${url}`);
-});
+export { typeDefs, resolvers };

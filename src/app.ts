@@ -1,29 +1,17 @@
 import 'dotenv/config';
-import Application from 'koa';
-import bodyParser from 'koa-bodyparser';
-import router from './router';
+import { ApolloServer } from 'apollo-server';
+import { resolvers, typeDefs } from './graphql';
 
-const app = new Application();
-app.use(async (context, next) => {
-  console.log(`${context.request.method} ${context.request.url}`);
-
-  const origin = process.env.FRONTEND_ORIGIN;
-  if (origin) {
-    // Add CORS headers
-    context.set('Access-Control-Allow-Origin', origin);
-    context.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    context.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  }
-
-  try {
-    await next();
-  } catch (err) {
-    context.response.status = 500;
-    context.response.body = err.message;
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  cors: {
+    origin: process.env.FRONTEND_ORIGIN,
+    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
+    methods: 'GET, POST, PUT, DELETE, OPTIONS',
   }
 });
-app.use(bodyParser());
-app.use(router.routes());
-app.use(router.allowedMethods());
 const port = process.env.PORT;
-app.listen({ port: port ? parseInt(port, 10) : 8081 });
+server.listen({ port: port ? parseInt(port, 10) : 8081 }).then(({ url }) => {
+  console.log(`Server running at ${url}`);
+});
