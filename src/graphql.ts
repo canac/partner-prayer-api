@@ -4,7 +4,7 @@ import { getLastCompletedDay, setLastCompletedDay } from './db/completedDays';
 import { getPartners } from './db/partners';
 import { generateSchedule, getSchedule } from './db/schedule';
 import { setSkippedDayStatus } from './db/skippedDays';
-import { Partner, Schedule } from './db/types';
+import { ObjectId, Partner, Schedule } from './db/types';
 
 // Construct the GraphQL schema
 const typeDefs = gql`
@@ -18,7 +18,7 @@ const typeDefs = gql`
 
   type Schedule {
     month: Date!
-    partnersByDay: [[ID!]]
+    partnersByDay: [[Partner!]]
     skippedDayIds: [Int!]
   }
 
@@ -59,6 +59,17 @@ const resolvers = {
     async skipDay(_: any, { day, isSkipped}: SkipDayMutationParams): Promise<Schedule> {
       await setSkippedDayStatus(day, isSkipped);
       return await generateSchedule(day);
+    }
+  },
+  Schedule: {
+    async partnersByDay(context: Schedule): Promise<Partner[][]> {
+      const partners = await getPartners();
+
+      // Index the partners by their id
+      const partnersById = new Map<string, Partner>(partners.map(partner => ([ partner._id.toHexString(), partner ])));
+
+      // Convert the partner ids to full partner models
+      return context.partnersByDay.map(partnerIds => partnerIds.map((id: ObjectId) => partnersById.get(id.toHexString()) || []).flat());
     }
   },
   Query: {
