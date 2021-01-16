@@ -1,0 +1,24 @@
+scalar Date
+
+type Partner {
+  _id: ID!
+  firstName: String!
+  lastName: String!
+}
+
+type Schedule {
+  month: Date!
+  partnersByDay: [[Partner!]]
+  skippedDayIds: [Int!]
+}
+
+type Query {
+  lastCompletedDay: Date
+  partners: [Partner]
+  schedule(month: Date!): Schedule
+}
+
+type Mutation {
+  completeDay(day: Date!): Date
+  skipDay(day: Date!, isSkipped: Boolean!): Schedule
+}

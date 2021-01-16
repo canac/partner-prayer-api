@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs';
 import { gql } from 'apollo-server';
 import { GraphQLDate } from 'graphql-iso-date';
 import { getLastCompletedDay, setLastCompletedDay } from './db/completedDays';
@@ -7,32 +8,7 @@ import { setSkippedDayStatus } from './db/skippedDays';
 import { ObjectId, Partner, Schedule } from './db/types';
 
 // Construct the GraphQL schema
-const typeDefs = gql`
-  scalar Date
-
-  type Partner {
-    _id: ID!
-    firstName: String!
-    lastName: String!
-  }
-
-  type Schedule {
-    month: Date!
-    partnersByDay: [[Partner!]]
-    skippedDayIds: [Int!]
-  }
-
-  type Query {
-    lastCompletedDay: Date
-    partners: [Partner]
-    schedule(month: Date!): Schedule
-  }
-
-  type Mutation {
-    completeDay(day: Date!): Date
-    skipDay(day: Date!, isSkipped: Boolean!): Schedule
-  }
-`;
+const typeDefs = gql(readFileSync('schema.graphql', 'utf8'));
 
 type CompleteDayMutationParams = {
   day: Date;
