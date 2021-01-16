@@ -13,11 +13,6 @@ export interface Partner {
   lastName: string;
 }
 
-export interface Settings {
-  _id: ObjectId;
-  lastCompletedDay: Date;
-}
-
 export interface SkippedDay {
   _id: ObjectId;
   date: Date;
