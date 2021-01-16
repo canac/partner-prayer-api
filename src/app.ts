@@ -1,9 +1,10 @@
 import 'dotenv/config';
 import { ApolloServer } from 'apollo-server';
+import { DIRECTIVES } from '@graphql-codegen/typescript-mongodb';
 import { resolvers, typeDefs } from './graphql';
 
 const server = new ApolloServer({
-  typeDefs,
+  typeDefs: [DIRECTIVES, typeDefs],
   resolvers,
   cors: {
     origin: process.env.FRONTEND_ORIGIN,

@@ -1,5 +1,4 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { Partner as PartnerModel, Schedule as ScheduleModel } from '../db/types';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -12,8 +11,16 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  Date: any;
+  Date: Date;
 };
+
+
+
+
+
+
+
+
 
 
 export type Partner = {
@@ -25,6 +32,7 @@ export type Partner = {
 
 export type Schedule = {
   __typename?: 'Schedule';
+  _id: Scalars['ID'];
   month: Scalars['Date'];
   partnersByDay: Array<Array<Partner>>;
   skippedDayIds: Array<Scalars['Int']>;
@@ -57,6 +65,25 @@ export type MutationCompleteDayArgs = {
 export type MutationSkipDayArgs = {
   day: Scalars['Date'];
   isSkipped: Scalars['Boolean'];
+};
+
+export type AdditionalEntityFields = {
+  path?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
+};
+
+import { ObjectID } from 'mongodb';
+export type PartnerModel = {
+  _id: ObjectID,
+  firstName: string,
+  lastName: string,
+};
+
+export type ScheduleModel = {
+  _id: ObjectID,
+  month: Date,
+  partnersByDay: Array<Array<PartnerModel['_id']>>,
+  skippedDayIds: Array<number>,
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -147,6 +174,7 @@ export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>;
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  AdditionalEntityFields: AdditionalEntityFields;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -160,7 +188,43 @@ export type ResolversParentTypes = ResolversObject<{
   Query: {};
   Mutation: {};
   Boolean: Scalars['Boolean'];
+  AdditionalEntityFields: AdditionalEntityFields;
 }>;
+
+export type UnionDirectiveArgs = {   discriminatorField?: Maybe<Scalars['String']>;
+  additionalFields?: Maybe<Array<Maybe<AdditionalEntityFields>>>; };
+
+export type UnionDirectiveResolver<Result, Parent, ContextType = any, Args = UnionDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type AbstractEntityDirectiveArgs = {   discriminatorField: Scalars['String'];
+  additionalFields?: Maybe<Array<Maybe<AdditionalEntityFields>>>; };
+
+export type AbstractEntityDirectiveResolver<Result, Parent, ContextType = any, Args = AbstractEntityDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type EntityDirectiveArgs = {   embedded?: Maybe<Scalars['Boolean']>;
+  additionalFields?: Maybe<Array<Maybe<AdditionalEntityFields>>>; };
+
+export type EntityDirectiveResolver<Result, Parent, ContextType = any, Args = EntityDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type ColumnDirectiveArgs = {   overrideType?: Maybe<Scalars['String']>; };
+
+export type ColumnDirectiveResolver<Result, Parent, ContextType = any, Args = ColumnDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type IdDirectiveArgs = {  };
+
+export type IdDirectiveResolver<Result, Parent, ContextType = any, Args = IdDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type LinkDirectiveArgs = {   overrideType?: Maybe<Scalars['String']>; };
+
+export type LinkDirectiveResolver<Result, Parent, ContextType = any, Args = LinkDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type EmbeddedDirectiveArgs = {  };
+
+export type EmbeddedDirectiveResolver<Result, Parent, ContextType = any, Args = EmbeddedDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type MapDirectiveArgs = {   path: Scalars['String']; };
+
+export type MapDirectiveResolver<Result, Parent, ContextType = any, Args = MapDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
   name: 'Date';
@@ -174,6 +238,7 @@ export type PartnerResolvers<ContextType = any, ParentType extends ResolversPare
 }>;
 
 export type ScheduleResolvers<ContextType = any, ParentType extends ResolversParentTypes['Schedule'] = ResolversParentTypes['Schedule']> = ResolversObject<{
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   month?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   partnersByDay?: Resolver<Array<Array<ResolversTypes['Partner']>>, ParentType, ContextType>;
   skippedDayIds?: Resolver<Array<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -205,3 +270,20 @@ export type Resolvers<ContextType = any> = ResolversObject<{
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
  */
 export type IResolvers<ContextType = any> = Resolvers<ContextType>;
+export type DirectiveResolvers<ContextType = any> = ResolversObject<{
+  union?: UnionDirectiveResolver<any, any, ContextType>;
+  abstractEntity?: AbstractEntityDirectiveResolver<any, any, ContextType>;
+  entity?: EntityDirectiveResolver<any, any, ContextType>;
+  column?: ColumnDirectiveResolver<any, any, ContextType>;
+  id?: IdDirectiveResolver<any, any, ContextType>;
+  link?: LinkDirectiveResolver<any, any, ContextType>;
+  embedded?: EmbeddedDirectiveResolver<any, any, ContextType>;
+  map?: MapDirectiveResolver<any, any, ContextType>;
+}>;
+
+
+/**
+ * @deprecated
+ * Use "DirectiveResolvers" root object instead. If you wish to get "IDirectiveResolvers", add "typesPrefix: I" to your config.
+ */
+export type IDirectiveResolvers<ContextType = any> = DirectiveResolvers<ContextType>;

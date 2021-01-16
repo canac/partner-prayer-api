@@ -1,15 +1,16 @@
 scalar Date
 
-type Partner {
-  _id: ID!
-  firstName: String!
-  lastName: String!
+type Partner @entity {
+  _id: ID! @id
+  firstName: String! @column
+  lastName: String! @column
 }
 
-type Schedule {
-  month: Date!
-  partnersByDay: [[Partner!]!]!
-  skippedDayIds: [Int!]!
+type Schedule @entity {
+  _id: ID! @id
+  month: Date! @column
+  partnersByDay: [[Partner!]!]! @link
+  skippedDayIds: [Int!]! @column
 }
 
 type Query {

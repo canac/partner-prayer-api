@@ -1,3 +1,5 @@
+import { PartnerModel, ScheduleModel } from '../generated/graphql';
+
 import { ObjectId } from 'mongodb';
 
 export { ObjectId };
@@ -7,21 +9,11 @@ export interface CompletedDay {
   lastCompletedDay: Date;
 };
 
-export interface Partner {
-  _id: ObjectId;
-  firstName: string;
-  lastName: string;
-}
-
 export interface SkippedDay {
   _id: ObjectId;
   date: Date;
   isSkipped: boolean;
 }
 
-export type Schedule = {
-  _id: ObjectId;
-  month: Date;
-  partnersByDay: ObjectId[][];
-  skippedDayIds: number[];
-}
+export type Partner = PartnerModel;
+export type Schedule = ScheduleModel;

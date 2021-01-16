@@ -12,6 +12,7 @@
     "start": "node dist/app.js"
   },
   "dependencies": {
+    "@graphql-codegen/typescript-mongodb": "^1.17.9",
     "apollo-server": "^2.19.2",
     "dotenv": "^8.2.0",
     "graphql": "^15.4.0",
