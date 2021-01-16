@@ -1,4 +1,4 @@
-import { endOfMonth, startOfDay, startOfMonth } from 'date-fns';
+import { endOfMonth, startOfDay, startOfMonth } from '../date-fns-utc';
 import { getDb } from './db';
 import { SkippedDay } from './types';
 

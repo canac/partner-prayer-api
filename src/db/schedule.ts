@@ -1,4 +1,4 @@
-import { eachDayOfInterval, endOfMonth, isSameDay, startOfMonth } from 'date-fns';
+import { eachDayOfInterval, endOfMonth, isSameDay, startOfMonth } from '../date-fns-utc';
 import { getDb } from './db';
 import { ObjectId, Schedule } from './types';
 import { getPartners } from './partners';
@@ -41,7 +41,7 @@ export async function generateSchedule(dirtyMonth: Date): Promise<Schedule> {
   const partners = await getPartners();
   const partnerIds = partners.map(({ _id }) => _id);
   const partnersByDay = calculatePartnersByDay(month, skippedDays, partnerIds);
-  const skippedDayIds = skippedDays.map(day => day.getDate() - 1);
+  const skippedDayIds = skippedDays.map(day => day.getUTCDate() - 1);
   const { _id } = (await db.collection<Schedule>('schedule').findOneAndUpdate(
     { month },
     { $set: { partnersByDay, skippedDayIds } },
