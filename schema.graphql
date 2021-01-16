@@ -8,8 +8,8 @@ type Partner {
 
 type Schedule {
   month: Date!
-  partnersByDay: [[Partner!]]
-  skippedDayIds: [Int!]
+  partnersByDay: [[Partner!]!]!
+  skippedDayIds: [Int!]!
 }
 
 type Query {

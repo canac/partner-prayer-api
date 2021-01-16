@@ -1,0 +1,13 @@
+overwrite: true
+schema: "schema.graphql"
+documents: null
+generates:
+  src/generated/graphql.ts:
+    config:
+      mappers:
+        Partner: ../db/types#Partner as PartnerModel
+        Schedule: ../db/types#Schedule as ScheduleModel
+      useIndexSignature: true
+    plugins:
+      - "typescript"
+      - "typescript-resolvers"

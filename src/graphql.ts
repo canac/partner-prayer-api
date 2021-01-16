@@ -1,3 +1,4 @@
+import { QueryScheduleArgs, MutationCompleteDayArgs, MutationSkipDayArgs, Resolvers } from './generated/graphql';
 import { readFileSync } from 'fs';
 import { gql } from 'apollo-server';
 import { GraphQLDate } from 'graphql-iso-date';
@@ -10,29 +11,16 @@ import { ObjectId, Partner, Schedule } from './db/types';
 // Construct the GraphQL schema
 const typeDefs = gql(readFileSync('schema.graphql', 'utf8'));
 
-type CompleteDayMutationParams = {
-  day: Date;
-}
-
-type SkipDayMutationParams = {
-  day: Date;
-  isSkipped: boolean;
-}
-
-type ScheduleQueryParams = {
-  month: Date;
-};
-
 // Provide resolver functions for the schema fields
-const resolvers = {
+const resolvers: Resolvers = {
   Date: GraphQLDate,
   Mutation: {
-    async completeDay(_: any, { day }: CompleteDayMutationParams): Promise<Date> {
+    async completeDay(_: any, { day }: MutationCompleteDayArgs): Promise<Date> {
       await setLastCompletedDay(day);
       return day;
     },
 
-    async skipDay(_: any, { day, isSkipped}: SkipDayMutationParams): Promise<Schedule> {
+    async skipDay(_: any, { day, isSkipped}: MutationSkipDayArgs): Promise<Schedule> {
       await setSkippedDayStatus(day, isSkipped);
       return await generateSchedule(day);
     }
@@ -57,7 +45,7 @@ const resolvers = {
       return await getPartners();
     },
 
-    async schedule(_: any, { month }: ScheduleQueryParams): Promise<Schedule> {
+    async schedule(_: any, { month }: QueryScheduleArgs): Promise<Schedule> {
       return await getSchedule(month);
     },
   },
