@@ -6,7 +6,7 @@ import { getLastCompletedDay, setLastCompletedDay } from './db/completedDays';
 import { getPartners } from './db/partners';
 import { generateSchedule, getSchedule } from './db/schedule';
 import { setSkippedDayStatus } from './db/skippedDays';
-import { ObjectId, Partner, Schedule } from './db/types';
+import { ObjectId, PartnerModel, ScheduleModel } from './db/types';
 
 // Construct the GraphQL schema
 const typeDefs = gql(readFileSync('schema.graphql', 'utf8'));
@@ -20,17 +20,17 @@ const resolvers: Resolvers = {
       return day;
     },
 
-    async skipDay(_: any, { day, isSkipped}: MutationSkipDayArgs): Promise<Schedule> {
+    async skipDay(_: any, { day, isSkipped}: MutationSkipDayArgs): Promise<ScheduleModel> {
       await setSkippedDayStatus(day, isSkipped);
       return await generateSchedule(day);
     }
   },
   Schedule: {
-    async partnersByDay(context: Schedule): Promise<Partner[][]> {
+    async partnersByDay(context: ScheduleModel): Promise<PartnerModel[][]> {
       const partners = await getPartners();
 
       // Index the partners by their id
-      const partnersById = new Map<string, Partner>(partners.map(partner => ([ partner._id.toHexString(), partner ])));
+      const partnersById = new Map<string, PartnerModel>(partners.map(partner => ([ partner._id.toHexString(), partner ])));
 
       // Convert the partner ids to full partner models
       return context.partnersByDay.map(partnerIds => partnerIds.map((id: ObjectId) => partnersById.get(id.toHexString()) || []).flat());
@@ -41,11 +41,11 @@ const resolvers: Resolvers = {
       return await getLastCompletedDay();
     },
 
-    async partners(): Promise<Partner[]> {
+    async partners(): Promise<PartnerModel[]> {
       return await getPartners();
     },
 
-    async schedule(_: any, { month }: QueryScheduleArgs): Promise<Schedule> {
+    async schedule(_: any, { month }: QueryScheduleArgs): Promise<ScheduleModel> {
       return await getSchedule(month);
     },
   },

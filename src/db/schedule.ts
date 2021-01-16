@@ -1,6 +1,6 @@
 import { eachDayOfInterval, endOfMonth, isSameDay, startOfMonth } from '../date-fns-utc';
 import { getDb } from './db';
-import { ObjectId, Schedule } from './types';
+import { ObjectId, ScheduleModel } from './types';
 import { getPartners } from './partners';
 import { getMonthSkippedDays } from './skippedDays';
 
@@ -32,7 +32,7 @@ function calculatePartnersByDay(month: Date, skippedDays: Date[], partnerIds: Ob
 }
 
 // Create or update the schedule for the specified month
-export async function generateSchedule(dirtyMonth: Date): Promise<Schedule> {
+export async function generateSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
   const month = startOfMonth(dirtyMonth);
   const db = await getDb();
 
@@ -42,7 +42,7 @@ export async function generateSchedule(dirtyMonth: Date): Promise<Schedule> {
   const partnerIds = partners.map(({ _id }) => _id);
   const partnersByDay = calculatePartnersByDay(month, skippedDays, partnerIds);
   const skippedDayIds = skippedDays.map(day => day.getUTCDate() - 1);
-  const { _id } = (await db.collection<Schedule>('schedule').findOneAndUpdate(
+  const { _id } = (await db.collection<ScheduleModel>('schedule').findOneAndUpdate(
     { month },
     { $set: { partnersByDay, skippedDayIds } },
     { projection: { _id: 1 }, upsert: true, returnOriginal: false }
@@ -59,8 +59,8 @@ export async function generateSchedule(dirtyMonth: Date): Promise<Schedule> {
 }
 
 // Return the schedule for the specified month
-export async function getSchedule(dirtyMonth: Date): Promise<Schedule> {
+export async function getSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
   const month = startOfMonth(dirtyMonth);
   const db = await getDb();
-  return await db.collection<Schedule>('schedule').findOne({ month }) || await generateSchedule(month);
+  return await db.collection<ScheduleModel>('schedule').findOne({ month }) || await generateSchedule(month);
 }
