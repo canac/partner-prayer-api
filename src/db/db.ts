@@ -18,5 +18,6 @@ export async function getDb(): Promise<Db> {
   const uri = `${protocol}://${auth}${host}/partnerPrayer?retryWrites=true&w=majority`;
   const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
   await client.connect();
-  return client.db('partnerPrayer');
+  db = client.db('partnerPrayer');
+  return db;
 };
