@@ -12,6 +12,6 @@ export async function setLastCompletedDay(lastCompletedDay: Date): Promise<void>
   await db.collection<CompletedDayModel>('completedDays').updateOne(
     {},
     { $set: { lastCompletedDay } },
-    { upsert: true }
+    { upsert: true },
   );
 }

@@ -1,4 +1,4 @@
-import { MongoClient, Db } from 'mongodb';
+import { Db, MongoClient } from 'mongodb';
 
 let db: Db | null = null;
 
@@ -9,15 +9,28 @@ const {
   DB_PASS: password,
 } = process.env;
 
+// eslint-disable-next-line import/prefer-default-export
 export async function getDb(): Promise<Db> {
   if (db) {
     return db;
   }
 
-  const auth = user || password ? `${user}:${password}@` : '';
+  if ((user && !password) || (!user && password)) {
+    throw new Error('Database user and password must either both be specified or neither');
+  }
+
+  if (!protocol) {
+    throw new Error('Database protocol was not specified');
+  }
+
+  if (!host) {
+    throw new Error('Database host was not specified');
+  }
+
+  const auth = user && password ? `${user}:${password}@` : '';
   const uri = `${protocol}://${auth}${host}/partnerPrayer?retryWrites=true&w=majority`;
   const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
   await client.connect();
   db = client.db('partnerPrayer');
   return db;
-};
+}

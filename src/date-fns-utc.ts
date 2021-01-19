@@ -7,7 +7,7 @@ type Interval = {
   end: Date;
 }
 
-export function eachDayOfInterval(interval: Interval) {
+export function eachDayOfInterval(interval: Interval): Date[] {
   const startDate = new Date(interval.start);
   const endDate = new Date(interval.end);
   const endTime = endDate.getTime();
@@ -24,32 +24,32 @@ export function eachDayOfInterval(interval: Interval) {
   while (currentDate.getTime() <= endTime) {
     dates.push(new Date(currentDate)); // clone currentDate
     currentDate.setUTCDate(currentDate.getUTCDate() + 1);
-    currentDate.setUTCHours(0, 0, 0, 0)
+    currentDate.setUTCHours(0, 0, 0, 0);
   }
 
   return dates;
 }
 
-export function endOfMonth(dirtyDate: Date) {
+export function startOfDay(dirtyDate: Date): Date {
+  const date: Date = new Date(dirtyDate);
+  date.setUTCHours(0, 0, 0, 0);
+  return date;
+}
+
+export function startOfMonth(dirtyDate: Date): Date {
+  const date: Date = startOfDay(dirtyDate);
+  date.setUTCDate(1);
+  date.setUTCHours(0, 0, 0, 0);
+  return date;
+}
+
+export function endOfMonth(dirtyDate: Date): Date {
   const date: Date = startOfMonth(dirtyDate);
   date.setUTCFullYear(date.getUTCFullYear(), date.getUTCMonth() + 1, 0);
   date.setUTCHours(23, 59, 59, 999);
   return date;
 }
 
-export function isSameDay(left: Date, right: Date) {
+export function isSameDay(left: Date, right: Date): boolean {
   return startOfDay(left).getTime() === startOfDay(right).getTime();
-}
-
-export function startOfDay(dirtyDate: Date) {
-  const date: Date = new Date(dirtyDate);
-  date.setUTCHours(0, 0, 0, 0);
-  return date;
-}
-
-export function startOfMonth(dirtyDate: Date) {
-  const date: Date = startOfDay(dirtyDate);
-  date.setUTCDate(1);
-  date.setUTCHours(0, 0, 0, 0);
-  return date;
 }

@@ -13,7 +13,7 @@ export async function getMonthSkippedDays(month: Date): Promise<Date[]> {
     isSkipped: true,
   }).toArray();
 
-  return skippedDayDocs.map(day => day.date);
+  return skippedDayDocs.map((day) => day.date);
 }
 
 // Update the skipped status of the given date
@@ -22,6 +22,6 @@ export async function setSkippedDayStatus(date: Date, isSkipped: boolean): Promi
   await db.collection<SkippedDayModel>('skippedDays').updateOne(
     { date: startOfDay(date) },
     { $set: { isSkipped } },
-    { upsert: true }
+    { upsert: true },
   );
 }
