@@ -1,9 +1,8 @@
 import { readFileSync } from 'fs';
 import { gql } from 'apollo-server';
 import { GraphQLDate } from 'graphql-iso-date';
-import { getLastCompletedDay, setLastCompletedDay } from './db/completedDays';
 import { getPartners } from './db/partners';
-import { generateSchedule, getSchedule } from './db/schedule';
+import { completeDay, generateSchedule, getSchedule } from './db/schedule';
 import { setSkippedDayStatus } from './db/skippedDays';
 import { ObjectId, PartnerModel, ScheduleModel } from './db/types';
 import {
@@ -18,7 +17,7 @@ const resolvers: Resolvers = {
   Date: GraphQLDate,
   Mutation: {
     async completeDay(_: unknown, { day }: MutationCompleteDayArgs): Promise<Date> {
-      await setLastCompletedDay(day);
+      await completeDay(day);
       return day;
     },
 
@@ -42,10 +41,6 @@ const resolvers: Resolvers = {
     },
   },
   Query: {
-    async lastCompletedDay(): Promise<Date> {
-      return getLastCompletedDay();
-    },
-
     async partners(): Promise<PartnerModel[]> {
       return getPartners();
     },

@@ -38,6 +38,14 @@ export async function generateSchedule(dirtyMonth: Date): Promise<ScheduleModel>
   const month = startOfMonth(dirtyMonth);
   const db = await getDb();
 
+  const existingSchedule = await db.collection<ScheduleModel>('schedule').findOne({ month });
+  const completedDays: number = existingSchedule?.completedDays ?? 0;
+
+  const newFields: Partial<ScheduleModel> = {};
+  if (!existingSchedule) {
+    newFields.completedDays = 0;
+  }
+
   // Create the new schedule
   const skippedDays = await getSkippedDays(month);
   const partners = await getPartners();
@@ -45,7 +53,7 @@ export async function generateSchedule(dirtyMonth: Date): Promise<ScheduleModel>
   const partnersByDay = calculatePartnersByDay(month, skippedDays, partnerIds);
   const { _id } = (await db.collection<ScheduleModel>('schedule').findOneAndUpdate(
     { month },
-    { $set: { partnersByDay, skippedDays } },
+    { $set: { partnersByDay, skippedDays, ...newFields } },
     { projection: { _id: 1 }, upsert: true, returnOriginal: false },
   )).value || {};
   if (!_id) {
@@ -54,6 +62,7 @@ export async function generateSchedule(dirtyMonth: Date): Promise<ScheduleModel>
   return {
     _id,
     month,
+    completedDays,
     partnersByDay,
     skippedDays,
   };
@@ -64,4 +73,13 @@ export async function getSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
   const month = startOfMonth(dirtyMonth);
   const db = await getDb();
   return await db.collection<ScheduleModel>('schedule').findOne({ month }) || generateSchedule(month);
+}
+
+// Mark the specified day as completed
+export async function completeDay(dirtyDay: Date): Promise<void> {
+  const db = await getDb();
+  await db.collection<ScheduleModel>('schedule').updateOne(
+    { month: startOfMonth(dirtyDay) },
+    { $set: { completedDays: dirtyDay.getUTCDate() } },
+  );
 }

@@ -9,12 +9,12 @@ type Partner @entity {
 type Schedule @entity {
   _id: ID! @id
   month: Date! @column
+  completedDays: Int! @column
   partnersByDay: [[Partner!]!]! @link
   skippedDays: [Int!]! @column
 }
 
 type Query {
-  lastCompletedDay: Date
   partners: [Partner]
   schedule(month: Date!): Schedule
 }

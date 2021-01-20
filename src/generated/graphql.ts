@@ -34,13 +34,13 @@ export type Schedule = {
   __typename?: 'Schedule';
   _id: Scalars['ID'];
   month: Scalars['Date'];
+  completedDays: Scalars['Int'];
   partnersByDay: Array<Array<Partner>>;
   skippedDays: Array<Scalars['Int']>;
 };
 
 export type Query = {
   __typename?: 'Query';
-  lastCompletedDay?: Maybe<Scalars['Date']>;
   partners?: Maybe<Array<Maybe<Partner>>>;
   schedule?: Maybe<Schedule>;
 };
@@ -82,6 +82,7 @@ export type PartnerModel = {
 export type ScheduleModel = {
   _id: ObjectID,
   month: Date,
+  completedDays: number,
   partnersByDay: Array<Array<PartnerModel['_id']>>,
   skippedDays: Array<number>,
 };
@@ -240,13 +241,13 @@ export type PartnerResolvers<ContextType = any, ParentType extends ResolversPare
 export type ScheduleResolvers<ContextType = any, ParentType extends ResolversParentTypes['Schedule'] = ResolversParentTypes['Schedule']> = ResolversObject<{
   _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   month?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  completedDays?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   partnersByDay?: Resolver<Array<Array<ResolversTypes['Partner']>>, ParentType, ContextType>;
   skippedDays?: Resolver<Array<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  lastCompletedDay?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
   partners?: Resolver<Maybe<Array<Maybe<ResolversTypes['Partner']>>>, ParentType, ContextType>;
   schedule?: Resolver<Maybe<ResolversTypes['Schedule']>, ParentType, ContextType, RequireFields<QueryScheduleArgs, 'month'>>;
 }>;
