@@ -11,6 +11,7 @@ export interface CompletedDayModel {
 
 export interface SkippedDayModel {
   _id: ObjectId;
-  date: Date;
+  month: Date;
+  dayId: number; // zero-based index of the day from the start of the month
   isSkipped: boolean;
 }

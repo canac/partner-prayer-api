@@ -1,26 +1,26 @@
 import {
-  eachDayOfInterval, endOfMonth, isSameDay, startOfMonth,
+  eachDayOfInterval, endOfMonth, startOfMonth,
 } from '../date-fns-utc';
 import { getDb } from './db';
 import { getPartners } from './partners';
-import { getMonthSkippedDays } from './skippedDays';
+import { getSkippedDays } from './skippedDays';
 import { ObjectId, ScheduleModel } from './types';
 
-// Return a boolean indicating whether the array of dates contains the specified dates
-function arrayHasDate(haystack: Date[], needle: Date) {
-  return haystack.some((date: Date) => isSameDay(date, needle));
-}
-
 // Calculate the prayer partner schedule for the specified date
-function calculatePartnersByDay(month: Date, skippedDays: Date[], partnerIds: ObjectId[]): ObjectId[][] {
-  const daysInMonth: Date[] = eachDayOfInterval({ start: startOfMonth(month), end: endOfMonth(month) });
+function calculatePartnersByDay(month: Date, skippedDays: number[], partnerIds: ObjectId[]): ObjectId[][] {
+  const skippedDaysSet = new Set(skippedDays);
+
+  const daysInMonth: number[] = eachDayOfInterval({
+    start: startOfMonth(month),
+    end: endOfMonth(month),
+  }).map((day, index) => index);
 
   // Count the number of days that are not skipped and will contain partners
-  const numDays: number = daysInMonth.filter((day) => !arrayHasDate(skippedDays, day)).length;
+  const numDays: number = daysInMonth.filter((day) => !skippedDaysSet.has(day)).length;
 
   let dayIndex = 0;
-  return daysInMonth.map((day: Date): ObjectId[] => {
-    if (arrayHasDate(skippedDays, day)) {
+  return daysInMonth.map((day: number): ObjectId[] => {
+    if (skippedDaysSet.has(day)) {
       // This day is skipped, so it gets no partners scheduled
       return [];
     }
@@ -39,14 +39,13 @@ export async function generateSchedule(dirtyMonth: Date): Promise<ScheduleModel>
   const db = await getDb();
 
   // Create the new schedule
-  const skippedDays = await getMonthSkippedDays(month);
+  const skippedDays = await getSkippedDays(month);
   const partners = await getPartners();
   const partnerIds = partners.map(({ _id }) => _id);
   const partnersByDay = calculatePartnersByDay(month, skippedDays, partnerIds);
-  const skippedDayIds = skippedDays.map((day) => day.getUTCDate() - 1);
   const { _id } = (await db.collection<ScheduleModel>('schedule').findOneAndUpdate(
     { month },
-    { $set: { partnersByDay, skippedDayIds } },
+    { $set: { partnersByDay, skippedDays } },
     { projection: { _id: 1 }, upsert: true, returnOriginal: false },
   )).value || {};
   if (!_id) {
@@ -56,7 +55,7 @@ export async function generateSchedule(dirtyMonth: Date): Promise<ScheduleModel>
     _id,
     month,
     partnersByDay,
-    skippedDayIds,
+    skippedDays,
   };
 }
 

@@ -35,7 +35,7 @@ export type Schedule = {
   _id: Scalars['ID'];
   month: Scalars['Date'];
   partnersByDay: Array<Array<Partner>>;
-  skippedDayIds: Array<Scalars['Int']>;
+  skippedDays: Array<Scalars['Int']>;
 };
 
 export type Query = {
@@ -83,7 +83,7 @@ export type ScheduleModel = {
   _id: ObjectID,
   month: Date,
   partnersByDay: Array<Array<PartnerModel['_id']>>,
-  skippedDayIds: Array<number>,
+  skippedDays: Array<number>,
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -241,7 +241,7 @@ export type ScheduleResolvers<ContextType = any, ParentType extends ResolversPar
   _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   month?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   partnersByDay?: Resolver<Array<Array<ResolversTypes['Partner']>>, ParentType, ContextType>;
-  skippedDayIds?: Resolver<Array<ResolversTypes['Int']>, ParentType, ContextType>;
+  skippedDays?: Resolver<Array<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

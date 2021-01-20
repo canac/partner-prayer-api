@@ -10,7 +10,7 @@ type Schedule @entity {
   _id: ID! @id
   month: Date! @column
   partnersByDay: [[Partner!]!]! @link
-  skippedDayIds: [Int!]! @column
+  skippedDays: [Int!]! @column
 }
 
 type Query {
