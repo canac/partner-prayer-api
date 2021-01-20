@@ -16,9 +16,10 @@ const typeDefs = gql(readFileSync('schema.graphql', 'utf8'));
 const resolvers: Resolvers = {
   Date: GraphQLDate,
   Mutation: {
-    async completeDay(_: unknown, { input: { month, completedDays } }: MutationCompleteDayArgs): Promise<Date> {
+    async completeDay(_: unknown, { input: { month, completedDays } }: MutationCompleteDayArgs):
+      Promise<ScheduleModel> {
       await completeDay(month, completedDays);
-      return month;
+      return generateSchedule(month);
     },
 
     async skipDay(_: unknown, { input: { month, dayId, isSkipped } }: MutationSkipDayArgs): Promise<ScheduleModel> {

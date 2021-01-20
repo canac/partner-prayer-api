@@ -63,7 +63,7 @@ export type SkipDayInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  completeDay?: Maybe<Scalars['Date']>;
+  completeDay?: Maybe<Schedule>;
   skipDay?: Maybe<Schedule>;
 };
 
@@ -267,7 +267,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  completeDay?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType, RequireFields<MutationCompleteDayArgs, 'input'>>;
+  completeDay?: Resolver<Maybe<ResolversTypes['Schedule']>, ParentType, ContextType, RequireFields<MutationCompleteDayArgs, 'input'>>;
   skipDay?: Resolver<Maybe<ResolversTypes['Schedule']>, ParentType, ContextType, RequireFields<MutationSkipDayArgs, 'input'>>;
 }>;
 

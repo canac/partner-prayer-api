@@ -1,5 +1,5 @@
 import {
-  eachDayOfInterval, endOfMonth, startOfMonth,
+  eachDayOfInterval, endOfMonth, startOfDay, startOfMonth,
 } from '../date-fns-utc';
 import { getDb } from './db';
 import { getPartners } from './partners';
@@ -7,13 +7,18 @@ import { getSkippedDays } from './skippedDays';
 import { ObjectId, ScheduleModel } from './types';
 
 // Calculate the prayer partner schedule for the specified date
-function calculatePartnersByDay(month: Date, skippedDays: number[], partnerIds: ObjectId[]): ObjectId[][] {
+function calculatePartnersByDay(
+  month: Date,
+  firstDay: number,
+  skippedDays: number[],
+  partnerIds: ObjectId[],
+): ObjectId[][] {
   const skippedDaysSet = new Set(skippedDays);
 
   const daysInMonth: number[] = eachDayOfInterval({
-    start: startOfMonth(month),
+    start: startOfDay(month),
     end: endOfMonth(month),
-  }).map((day, index) => index);
+  }).slice(firstDay).map((day) => day.getUTCDate() - 1);
 
   // Count the number of days that are not skipped and will contain partners
   const numDays: number = daysInMonth.filter((day) => !skippedDaysSet.has(day)).length;
@@ -39,7 +44,11 @@ export async function generateSchedule(dirtyMonth: Date): Promise<ScheduleModel>
   const db = await getDb();
 
   const existingSchedule = await db.collection<ScheduleModel>('schedule').findOne({ month });
-  const completedDays: number = existingSchedule?.completedDays ?? 0;
+  const existingPartnersByDay = existingSchedule?.partnersByDay || [];
+  const numCompletedDays = existingSchedule?.completedDays || 0;
+  const numCompletedPartners = existingPartnersByDay
+    .slice(0, numCompletedDays)
+    .reduce((total, partners) => total + partners.length, 0);
 
   const newFields: Partial<ScheduleModel> = {};
   if (!existingSchedule) {
@@ -50,7 +59,10 @@ export async function generateSchedule(dirtyMonth: Date): Promise<ScheduleModel>
   const skippedDays = await getSkippedDays(month);
   const partners = await getPartners();
   const partnerIds = partners.map(({ _id }) => _id);
-  const partnersByDay = calculatePartnersByDay(month, skippedDays, partnerIds);
+  const partnersByDay = [
+    ...existingPartnersByDay.slice(0, numCompletedDays),
+    ...calculatePartnersByDay(month, numCompletedDays, skippedDays, partnerIds.slice(numCompletedPartners)),
+  ];
   const { _id } = (await db.collection<ScheduleModel>('schedule').findOneAndUpdate(
     { month },
     { $set: { partnersByDay, skippedDays, ...newFields } },
@@ -62,7 +74,7 @@ export async function generateSchedule(dirtyMonth: Date): Promise<ScheduleModel>
   return {
     _id,
     month,
-    completedDays,
+    completedDays: numCompletedDays,
     partnersByDay,
     skippedDays,
   };

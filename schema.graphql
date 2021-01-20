@@ -31,6 +31,6 @@ input SkipDayInput {
 }
 
 type Mutation {
-  completeDay(input: CompleteDayInput!): Date
+  completeDay(input: CompleteDayInput!): Schedule
   skipDay(input: SkipDayInput!): Schedule
 }
