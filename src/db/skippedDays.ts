@@ -13,10 +13,10 @@ export async function getSkippedDays(month: Date): Promise<number[]> {
 }
 
 // Update the skipped status of the given date
-export async function setSkippedDayStatus(date: Date, isSkipped: boolean): Promise<void> {
+export async function setSkippedDayStatus(month: Date, dayId: number, isSkipped: boolean): Promise<void> {
   const db = await getDb();
   await db.collection<SkippedDayModel>('skippedDays').updateOne(
-    { month: startOfMonth(date), dayId: date.getUTCDate() - 1 },
+    { month: startOfMonth(month), dayId },
     { $set: { isSkipped } },
     { upsert: true },
   );

@@ -76,10 +76,10 @@ export async function getSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
 }
 
 // Mark the specified day as completed
-export async function completeDay(dirtyDay: Date): Promise<void> {
+export async function completeDay(month: Date, completedDays: number): Promise<void> {
   const db = await getDb();
   await db.collection<ScheduleModel>('schedule').updateOne(
-    { month: startOfMonth(dirtyDay) },
-    { $set: { completedDays: dirtyDay.getUTCDate() } },
+    { month: startOfMonth(month) },
+    { $set: { completedDays } },
   );
 }

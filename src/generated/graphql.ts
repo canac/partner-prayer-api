@@ -50,6 +50,17 @@ export type QueryScheduleArgs = {
   month: Scalars['Date'];
 };
 
+export type CompleteDayInput = {
+  month: Scalars['Date'];
+  completedDays: Scalars['Int'];
+};
+
+export type SkipDayInput = {
+  month: Scalars['Date'];
+  dayId: Scalars['Int'];
+  isSkipped: Scalars['Boolean'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   completeDay?: Maybe<Scalars['Date']>;
@@ -58,13 +69,12 @@ export type Mutation = {
 
 
 export type MutationCompleteDayArgs = {
-  day: Scalars['Date'];
+  input: CompleteDayInput;
 };
 
 
 export type MutationSkipDayArgs = {
-  day: Scalars['Date'];
-  isSkipped: Scalars['Boolean'];
+  input: SkipDayInput;
 };
 
 export type AdditionalEntityFields = {
@@ -173,8 +183,10 @@ export type ResolversTypes = ResolversObject<{
   Schedule: ResolverTypeWrapper<ScheduleModel>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Query: ResolverTypeWrapper<{}>;
-  Mutation: ResolverTypeWrapper<{}>;
+  CompleteDayInput: CompleteDayInput;
+  SkipDayInput: SkipDayInput;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Mutation: ResolverTypeWrapper<{}>;
   AdditionalEntityFields: AdditionalEntityFields;
 }>;
 
@@ -187,8 +199,10 @@ export type ResolversParentTypes = ResolversObject<{
   Schedule: ScheduleModel;
   Int: Scalars['Int'];
   Query: {};
-  Mutation: {};
+  CompleteDayInput: CompleteDayInput;
+  SkipDayInput: SkipDayInput;
   Boolean: Scalars['Boolean'];
+  Mutation: {};
   AdditionalEntityFields: AdditionalEntityFields;
 }>;
 
@@ -253,8 +267,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  completeDay?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType, RequireFields<MutationCompleteDayArgs, 'day'>>;
-  skipDay?: Resolver<Maybe<ResolversTypes['Schedule']>, ParentType, ContextType, RequireFields<MutationSkipDayArgs, 'day' | 'isSkipped'>>;
+  completeDay?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType, RequireFields<MutationCompleteDayArgs, 'input'>>;
+  skipDay?: Resolver<Maybe<ResolversTypes['Schedule']>, ParentType, ContextType, RequireFields<MutationSkipDayArgs, 'input'>>;
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{

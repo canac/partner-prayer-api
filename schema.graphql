@@ -19,7 +19,18 @@ type Query {
   schedule(month: Date!): Schedule
 }
 
+input CompleteDayInput {
+  month: Date!
+  completedDays: Int!
+}
+
+input SkipDayInput {
+  month: Date!
+  dayId: Int!
+  isSkipped: Boolean!
+}
+
 type Mutation {
-  completeDay(day: Date!): Date
-  skipDay(day: Date!, isSkipped: Boolean!): Schedule
+  completeDay(input: CompleteDayInput!): Date
+  skipDay(input: SkipDayInput!): Schedule
 }
