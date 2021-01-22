@@ -22,7 +22,10 @@ function calculatePartnersByDay(
 
   // Count the number of days that are not skipped and will contain partners
   const numDays: number = daysInMonth.filter((day) => !skippedDaysSet.has(day)).length;
+  const partnersPerDay: number = Math.floor(partnerIds.length / numDays);
+  const remainderPartners: number = partnerIds.length % numDays;
 
+  let numDistributedPartners = 0;
   let dayIndex = 0;
   return daysInMonth.map((day: number): ObjectId[] => {
     if (skippedDaysSet.has(day)) {
@@ -30,8 +33,10 @@ function calculatePartnersByDay(
       return [];
     }
 
-    const startIndex = Math.floor((dayIndex * partnerIds.length) / numDays);
-    const endIndex = Math.floor(((dayIndex + 1) * partnerIds.length) / numDays);
+    // Assign partnersPerDay to each day and give the remaining partners to the earlier days
+    const startIndex = numDistributedPartners;
+    const endIndex = numDistributedPartners + partnersPerDay + (dayIndex < remainderPartners ? 1 : 0);
+    numDistributedPartners = endIndex;
     dayIndex += 1;
 
     return partnerIds.slice(startIndex, endIndex);
