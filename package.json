@@ -4,15 +4,16 @@
   "description": "API for the Partner Prayer app",
   "main": "dist/app.js",
   "scripts": {
-    "build": "tsc",
-    "build-watch": "tsc --watch",
-    "dev": "concurrently --handle-input 'npm:build-watch' 'npm:gql-codegen-watch' 'npm:start-watch'",
+    "build": "esbuild --outdir=dist --platform=node --target=es2020 --format=cjs src/{**/,}*.ts",
+    "check-types": "tsc --noEmit",
+    "check-types-watch": "tsc --noEmit --watch",
+    "dev": "concurrently --handle-input 'npm=check-types-watch' 'npm:gql-codegen-watch' 'npm:start-watch'",
     "gql-codegen": "graphql-codegen --config codegen.yml",
     "gql-codegen-watch": "graphql-codegen --config codegen.yml --watch",
     "lint": "eslint .",
-    "run": "tsc && node .",
-    "start": "node dist/app.js",
-    "start-watch": "nodemon ."
+    "run": "npm run build && npm start",
+    "start": "node .",
+    "start-watch": "nodemon"
   },
   "dependencies": {
     "@graphql-codegen/typescript-mongodb": "^1.17.9",
@@ -32,6 +33,7 @@
     "@typescript-eslint/eslint-plugin": "^4.14.0",
     "@typescript-eslint/parser": "^4.14.0",
     "concurrently": "^5.3.0",
+    "esbuild": "^0.8.34",
     "eslint": "^7.18.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",

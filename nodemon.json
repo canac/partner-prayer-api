@@ -1,3 +1,5 @@
 {
-  "watch": "dist/"
+  "ignore": ["dist/"],
+  "ext": "ts",
+  "exec": "npm run run"
 }
