@@ -1,3 +1,8 @@
+'use strict';
+
 module.exports = {
-  'src/**/*.ts': () => ['tsc --noEmit', 'eslint . --cache'],
+  'src/**/*.ts': (files) => [
+    'tsc --noEmit',
+    `eslint --cache ${files.join(' ')}`,
+  ],
 };

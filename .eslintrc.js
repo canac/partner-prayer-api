@@ -9,7 +9,7 @@ module.exports = {
     'airbnb-base',
   ],
   overrides: [{
-    files: ['./.eslintrc.js'],
+    files: ['*.js'],
     parserOptions: {
       sourceType: 'script',
     },
