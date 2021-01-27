@@ -52,8 +52,5 @@
   "bugs": {
     "url": "https://github.com/canac/partner-prayer-api/issues"
   },
-  "homepage": "https://github.com/canac/partner-prayer-api#readme",
-  "lint-staged": {
-    "src/**/*.ts": ["tsc --noEmit", "eslint . --cache"]
-  }
+  "homepage": "https://github.com/canac/partner-prayer-api#readme"
 }
