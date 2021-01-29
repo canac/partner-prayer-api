@@ -1,6 +1,5 @@
-import {
-  eachDayOfInterval, endOfMonth, startOfDay, startOfMonth,
-} from '../date-fns-utc';
+import { range } from 'lodash';
+import { endOfMonth, startOfMonth } from '../date-fns-utc';
 import { getDb } from './db';
 import { getPartners } from './partners';
 import { getSkippedDays } from './skippedDays';
@@ -15,10 +14,8 @@ function calculatePartnersByDay(
 ): ObjectId[][] {
   const skippedDaysSet = new Set(skippedDays);
 
-  const daysInMonth: number[] = eachDayOfInterval({
-    start: startOfDay(month),
-    end: endOfMonth(month),
-  }).slice(firstDay).map((day) => day.getUTCDate() - 1);
+  const numDaysInMonth = endOfMonth(month).getUTCDate();
+  const daysInMonth: number[] = range(firstDay, numDaysInMonth);
 
   // Count the number of days that are not skipped and will contain partners
   const numDays: number = daysInMonth.filter((day) => !skippedDaysSet.has(day)).length;
