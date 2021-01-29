@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-export { PartnerModel, ScheduleModel } from '../generated/graphql';
+export { PartnerModel, ScheduleDayModel, ScheduleModel } from '../generated/graphql';
 
 export { ObjectId };
 

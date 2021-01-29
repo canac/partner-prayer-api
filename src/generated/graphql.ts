@@ -3,6 +3,7 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -30,13 +31,18 @@ export type Partner = {
   lastName: Scalars['String'];
 };
 
+export type ScheduleDay = {
+  __typename?: 'ScheduleDay';
+  partners: Array<Partner>;
+  isSkipped: Scalars['Boolean'];
+};
+
 export type Schedule = {
   __typename?: 'Schedule';
   _id: Scalars['ID'];
   month: Scalars['Date'];
   completedDays: Scalars['Int'];
-  partnersByDay: Array<Array<Partner>>;
-  skippedDays: Array<Scalars['Int']>;
+  days: Array<ScheduleDay>;
 };
 
 export type Query = {
@@ -89,12 +95,16 @@ export type PartnerModel = {
   lastName: string,
 };
 
+export type ScheduleDayModel = {
+  partners: Array<PartnerModel['_id']>,
+  isSkipped: boolean,
+};
+
 export type ScheduleModel = {
   _id: ObjectID,
   month: Date,
   completedDays: number,
-  partnersByDay: Array<Array<PartnerModel['_id']>>,
-  skippedDays: Array<number>,
+  days: Array<ScheduleDayModel>,
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -180,12 +190,13 @@ export type ResolversTypes = ResolversObject<{
   Partner: ResolverTypeWrapper<PartnerModel>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  ScheduleDay: ResolverTypeWrapper<Omit<ScheduleDay, 'partners'> & { partners: Array<ResolversTypes['Partner']> }>;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Schedule: ResolverTypeWrapper<ScheduleModel>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Query: ResolverTypeWrapper<{}>;
   CompleteDayInput: CompleteDayInput;
   SkipDayInput: SkipDayInput;
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Mutation: ResolverTypeWrapper<{}>;
   AdditionalEntityFields: AdditionalEntityFields;
 }>;
@@ -196,12 +207,13 @@ export type ResolversParentTypes = ResolversObject<{
   Partner: PartnerModel;
   ID: Scalars['ID'];
   String: Scalars['String'];
+  ScheduleDay: Omit<ScheduleDay, 'partners'> & { partners: Array<ResolversParentTypes['Partner']> };
+  Boolean: Scalars['Boolean'];
   Schedule: ScheduleModel;
   Int: Scalars['Int'];
   Query: {};
   CompleteDayInput: CompleteDayInput;
   SkipDayInput: SkipDayInput;
-  Boolean: Scalars['Boolean'];
   Mutation: {};
   AdditionalEntityFields: AdditionalEntityFields;
 }>;
@@ -252,12 +264,17 @@ export type PartnerResolvers<ContextType = any, ParentType extends ResolversPare
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type ScheduleDayResolvers<ContextType = any, ParentType extends ResolversParentTypes['ScheduleDay'] = ResolversParentTypes['ScheduleDay']> = ResolversObject<{
+  partners?: Resolver<Array<ResolversTypes['Partner']>, ParentType, ContextType>;
+  isSkipped?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type ScheduleResolvers<ContextType = any, ParentType extends ResolversParentTypes['Schedule'] = ResolversParentTypes['Schedule']> = ResolversObject<{
   _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   month?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   completedDays?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  partnersByDay?: Resolver<Array<Array<ResolversTypes['Partner']>>, ParentType, ContextType>;
-  skippedDays?: Resolver<Array<ResolversTypes['Int']>, ParentType, ContextType>;
+  days?: Resolver<Array<ResolversTypes['ScheduleDay']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -274,6 +291,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 export type Resolvers<ContextType = any> = ResolversObject<{
   Date?: GraphQLScalarType;
   Partner?: PartnerResolvers<ContextType>;
+  ScheduleDay?: ScheduleDayResolvers<ContextType>;
   Schedule?: ScheduleResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;

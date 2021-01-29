@@ -1,12 +1,12 @@
 import { readFileSync } from 'fs';
 import { gql } from 'apollo-server';
 import { GraphQLDate } from 'graphql-iso-date';
-import { ObjectId, PartnerModel, ScheduleModel } from './db/models';
+import { PartnerModel, ScheduleModel } from './db/models';
 import { getPartners } from './db/partners';
 import { completeDay, generateSchedule, getSchedule } from './db/schedule';
 import { setSkippedDayStatus } from './db/skippedDays';
 import {
-  MutationCompleteDayArgs, MutationSkipDayArgs, QueryScheduleArgs, Resolvers,
+  MutationCompleteDayArgs, MutationSkipDayArgs, QueryScheduleArgs, Resolvers, ResolversTypes,
 } from './generated/graphql';
 
 // Construct the GraphQL schema
@@ -28,17 +28,18 @@ const resolvers: Resolvers = {
     },
   },
   Schedule: {
-    async partnersByDay(context: ScheduleModel): Promise<PartnerModel[][]> {
-      const partners = await getPartners();
+    async days(schedule: ScheduleModel): Promise<Array<ResolversTypes['ScheduleDay']>> {
+      const allPartners = await getPartners();
 
       // Index the partners by their id
-      const partnersById = new Map<string, PartnerModel>(partners
+      const partnersById = new Map<string, PartnerModel>(allPartners
         .map((partner) => ([partner._id.toHexString(), partner])));
 
-      // Convert the partner ids to full partner models
-      return context.partnersByDay
-        .map((partnerIds) => partnerIds.map((id: ObjectId) => partnersById.get(id.toHexString()) || [])
-          .flat());
+      return schedule.days.map((day) => ({
+        ...day,
+        // Convert the partner ids to full partner models
+        partners: day.partners.map((id) => partnersById.get(id.toHexString()) || []).flat(),
+      }));
     },
   },
   Query: {
