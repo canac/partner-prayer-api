@@ -1,5 +1,5 @@
 import { getDb } from './db';
-import { PartnerModel } from './types';
+import { PartnerModel } from './models';
 
 // Return an array of the partners
 // eslint-disable-next-line import/prefer-default-export

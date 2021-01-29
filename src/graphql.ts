@@ -1,10 +1,10 @@
 import { readFileSync } from 'fs';
 import { gql } from 'apollo-server';
 import { GraphQLDate } from 'graphql-iso-date';
+import { ObjectId, PartnerModel, ScheduleModel } from './db/models';
 import { getPartners } from './db/partners';
 import { completeDay, generateSchedule, getSchedule } from './db/schedule';
 import { setSkippedDayStatus } from './db/skippedDays';
-import { ObjectId, PartnerModel, ScheduleModel } from './db/types';
 import {
   MutationCompleteDayArgs, MutationSkipDayArgs, QueryScheduleArgs, Resolvers,
 } from './generated/graphql';

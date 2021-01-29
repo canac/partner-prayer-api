@@ -1,7 +1,7 @@
 import { range } from 'lodash';
 import { endOfMonth, startOfMonth } from '../date-fns-utc';
 import { getDb } from './db';
-import { SkippedDayModel } from './types';
+import { SkippedDayModel } from './models';
 
 // Return an array of the day indexes in the month that are skipped
 export async function getSkippedDays(dirtyMonth: Date): Promise<number[]> {

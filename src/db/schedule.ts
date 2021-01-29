@@ -1,9 +1,9 @@
 import { range } from 'lodash';
 import { endOfMonth, startOfMonth } from '../date-fns-utc';
 import { getDb } from './db';
+import { ObjectId, ScheduleModel } from './models';
 import { getPartners } from './partners';
 import { getSkippedDays } from './skippedDays';
-import { ObjectId, ScheduleModel } from './types';
 
 // Calculate the prayer partner schedule for the specified date
 function calculatePartnersByDay(
