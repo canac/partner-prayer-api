@@ -7,6 +7,12 @@ import {
 import { getPartners } from './partners';
 import { getSkippedDays } from './skippedDays';
 
+// Return the days for the specified schedule
+export async function getScheduleDays(scheduleId: ObjectId): Promise<ScheduleDayModel[]> {
+  const db = await getDb();
+  return db.collection<ScheduleDayModel>('scheduleDay').find({ scheduleId }).toArray();
+}
+
 // Calculate the days in the prayer partner schedule for the specified month
 function calculateScheduleDays(
   schedule: ScheduleModel,
@@ -14,19 +20,18 @@ function calculateScheduleDays(
   partnerIds: ObjectId[],
 ): WithoutId<ScheduleDayModel>[] {
   const skippedDaysSet = new Set(skippedDays);
-  const firstDay = schedule.completedDays;
 
   const numDaysInMonth = endOfMonth(schedule.month).getUTCDate();
-  const daysInMonth: number[] = range(firstDay, numDaysInMonth);
+  const incompleteDays: number[] = range(schedule.completedDays, numDaysInMonth);
 
   // Count the number of days that are not skipped and will contain partners
-  const numDays: number = daysInMonth.filter((day) => !skippedDaysSet.has(day)).length;
+  const numDays: number = incompleteDays.filter((day) => !skippedDaysSet.has(day)).length;
   const partnersPerDay: number = Math.floor(partnerIds.length / numDays);
   const remainderPartners: number = partnerIds.length % numDays;
 
   let numDistributedPartners = 0;
   let dayIndex = 0;
-  return daysInMonth.map((day: number): WithoutId<ScheduleDayModel> => {
+  return incompleteDays.map((day: number): WithoutId<ScheduleDayModel> => {
     const isSkipped = skippedDaysSet.has(day);
     let partners: ObjectId[] = [];
     if (!isSkipped) {
@@ -52,43 +57,37 @@ export async function generateSchedule(dirtyMonth: Date): Promise<ScheduleModel>
   const month = startOfMonth(dirtyMonth);
   const db = await getDb();
 
-  const skippedDays = await getSkippedDays(month);
   const partners = await getPartners();
   const partnerIds = partners.map(({ _id }) => _id);
-  const existingSchedule = await db.collection<ScheduleModel>('schedule').findOne({ month });
-  if (existingSchedule) {
-    // Count how many partners exist in the already completed days
-    const scheduleDays = await db.collection<ScheduleDayModel>('scheduleDay')
-      .find({ scheduleId: existingSchedule._id }).toArray();
-    const numCompletedDays = existingSchedule.completedDays;
-    const numCompletedPartners = scheduleDays
-      .slice(0, numCompletedDays)
-      .reduce((total, day) => total + day.partners.length, 0);
-
-    // Keep the completed days the same and only update the remaining days
-    const days = calculateScheduleDays(existingSchedule, skippedDays, partnerIds.slice(numCompletedPartners));
-
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const day of days) {
-      await db.collection<ScheduleDayModel>('scheduleDay').updateOne(
-        { scheduleId: existingSchedule._id, dayId: day.dayId },
-        { $set: { partners: day.partners } },
-      );
-    }
-
-    // Update the schedule days in the database
-    return existingSchedule;
+  let schedule = await db.collection<ScheduleModel>('schedule').findOne({ month });
+  if (!schedule) {
+    // Create the schedule since it doesn't exist yet
+    const newScheduleFields: WithoutId<ScheduleModel> = { month, completedDays: 0 };
+    const { insertedId } = await db.collection<ScheduleModel>('schedule').insertOne(newScheduleFields);
+    schedule = { _id: insertedId, ...newScheduleFields };
   }
 
-  // Create the new schedule in the database
-  const newScheduleFields: WithoutId<ScheduleModel> = { month, completedDays: 0 };
-  const { insertedId } = await db.collection<ScheduleModel>('schedule').insertOne(newScheduleFields);
-  const newSchedule: ScheduleModel = { _id: insertedId, ...newScheduleFields };
-  const days = calculateScheduleDays(newSchedule, skippedDays, partnerIds);
-  await db.collection<ScheduleDayModel>('scheduleDay').insertMany(days);
+  // Count how many partners exist in the already completed days
+  const scheduleDays = await getScheduleDays(schedule._id);
+  const numCompletedDays = schedule.completedDays;
+  const numCompletedPartners = scheduleDays
+    .slice(0, numCompletedDays)
+    .reduce((total, day) => total + day.partners.length, 0);
 
-  // Update the existing schedule in the database
-  return newSchedule;
+  // Keep the completed days the same and only update the remaining days
+  const skippedDays = await getSkippedDays(month);
+  const days = calculateScheduleDays(schedule, skippedDays, partnerIds.slice(numCompletedPartners));
+
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const day of days) {
+    await db.collection<ScheduleDayModel>('scheduleDay').updateOne(
+      { scheduleId: schedule._id, dayId: day.dayId },
+      { $set: { partners: day.partners, isSkipped: day.isSkipped } },
+      { upsert: true },
+    );
+  }
+
+  return schedule;
 }
 
 // Return the schedule for the specified month
@@ -96,12 +95,6 @@ export async function getSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
   const month = startOfMonth(dirtyMonth);
   const db = await getDb();
   return await db.collection<ScheduleModel>('schedule').findOne({ month }) || generateSchedule(month);
-}
-
-// Return the days for the specified schedule
-export async function getScheduleDays(scheduleId: ObjectId): Promise<ScheduleDayModel[]> {
-  const db = await getDb();
-  return db.collection<ScheduleDayModel>('scheduleDay').find({ scheduleId }).toArray();
 }
 
 // Mark the specified day as completed
