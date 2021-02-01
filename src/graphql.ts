@@ -3,7 +3,9 @@ import { gql } from 'apollo-server';
 import { GraphQLDate } from 'graphql-iso-date';
 import { PartnerModel, ScheduleModel } from './db/models';
 import { getPartners } from './db/partners';
-import { completeDay, generateSchedule, getSchedule } from './db/schedule';
+import {
+  completeDay, generateSchedule, getSchedule, getScheduleDays,
+} from './db/schedule';
 import { setSkippedDayStatus } from './db/skippedDays';
 import {
   MutationCompleteDayArgs, MutationSkipDayArgs, QueryScheduleArgs, Resolvers, ResolversTypes,
@@ -35,8 +37,13 @@ const resolvers: Resolvers = {
       const partnersById = new Map<string, PartnerModel>(allPartners
         .map((partner) => ([partner._id.toHexString(), partner])));
 
-      return schedule.days.map((day) => ({
+      const days = await getScheduleDays(schedule._id);
+      return days.map((day) => ({
         ...day,
+
+        _id: day._id.toHexString(),
+        schedule,
+
         // Convert the partner ids to full partner models
         partners: day.partners.map((id) => partnersById.get(id.toHexString()) || []).flat(),
       }));

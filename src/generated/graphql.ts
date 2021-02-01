@@ -33,6 +33,9 @@ export type Partner = {
 
 export type ScheduleDay = {
   __typename?: 'ScheduleDay';
+  _id: Scalars['ID'];
+  schedule: Schedule;
+  dayId: Scalars['Int'];
   partners: Array<Partner>;
   isSkipped: Scalars['Boolean'];
 };
@@ -96,6 +99,9 @@ export type PartnerModel = {
 };
 
 export type ScheduleDayModel = {
+  _id: ObjectID,
+  scheduleId: ScheduleModel['_id'],
+  dayId: number,
   partners: Array<PartnerModel['_id']>,
   isSkipped: boolean,
 };
@@ -104,7 +110,6 @@ export type ScheduleModel = {
   _id: ObjectID,
   month: Date,
   completedDays: number,
-  days: Array<ScheduleDayModel>,
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -190,10 +195,10 @@ export type ResolversTypes = ResolversObject<{
   Partner: ResolverTypeWrapper<PartnerModel>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   String: ResolverTypeWrapper<Scalars['String']>;
-  ScheduleDay: ResolverTypeWrapper<Omit<ScheduleDay, 'partners'> & { partners: Array<ResolversTypes['Partner']> }>;
+  ScheduleDay: ResolverTypeWrapper<Omit<ScheduleDay, 'schedule' | 'partners'> & { schedule: ResolversTypes['Schedule'], partners: Array<ResolversTypes['Partner']> }>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Schedule: ResolverTypeWrapper<ScheduleModel>;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
   Query: ResolverTypeWrapper<{}>;
   CompleteDayInput: CompleteDayInput;
   SkipDayInput: SkipDayInput;
@@ -207,10 +212,10 @@ export type ResolversParentTypes = ResolversObject<{
   Partner: PartnerModel;
   ID: Scalars['ID'];
   String: Scalars['String'];
-  ScheduleDay: Omit<ScheduleDay, 'partners'> & { partners: Array<ResolversParentTypes['Partner']> };
+  ScheduleDay: Omit<ScheduleDay, 'schedule' | 'partners'> & { schedule: ResolversParentTypes['Schedule'], partners: Array<ResolversParentTypes['Partner']> };
+  Int: Scalars['Int'];
   Boolean: Scalars['Boolean'];
   Schedule: ScheduleModel;
-  Int: Scalars['Int'];
   Query: {};
   CompleteDayInput: CompleteDayInput;
   SkipDayInput: SkipDayInput;
@@ -265,6 +270,9 @@ export type PartnerResolvers<ContextType = any, ParentType extends ResolversPare
 }>;
 
 export type ScheduleDayResolvers<ContextType = any, ParentType extends ResolversParentTypes['ScheduleDay'] = ResolversParentTypes['ScheduleDay']> = ResolversObject<{
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  schedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType>;
+  dayId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   partners?: Resolver<Array<ResolversTypes['Partner']>, ParentType, ContextType>;
   isSkipped?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

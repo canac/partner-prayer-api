@@ -6,7 +6,10 @@ type Partner @entity {
   lastName: String! @column
 }
 
-type ScheduleDay @entity(embedded: true) {
+type ScheduleDay @entity {
+  _id: ID! @id
+  schedule: Schedule! @link @map(path: "scheduleId")
+  dayId: Int! @column
   partners: [Partner!]! @link
   isSkipped: Boolean! @column
 }
@@ -15,7 +18,7 @@ type Schedule @entity {
   _id: ID! @id
   month: Date! @column
   completedDays: Int! @column
-  days: [ScheduleDay!]! @embedded
+  days: [ScheduleDay!]!
 }
 
 type Query {
