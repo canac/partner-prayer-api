@@ -3,9 +3,7 @@ import { gql } from 'apollo-server';
 import { GraphQLDate } from 'graphql-iso-date';
 import { PartnerModel, ScheduleModel } from './db/models';
 import { getPartners } from './db/partners';
-import {
-  completeDay, generateSchedule, getSchedule, getScheduleDays,
-} from './db/schedule';
+import { completeDay, getSchedule, getScheduleDays } from './db/schedule';
 import { setSkippedDayStatus } from './db/skippedDays';
 import {
   MutationCompleteDayArgs, MutationSkipDayArgs, QueryScheduleArgs, Resolvers, ResolversTypes,
@@ -21,12 +19,12 @@ const resolvers: Resolvers = {
     async completeDay(_: unknown, { input: { month, completedDays } }: MutationCompleteDayArgs):
       Promise<ScheduleModel> {
       await completeDay(month, completedDays);
-      return generateSchedule(month);
+      return getSchedule(month);
     },
 
     async skipDay(_: unknown, { input: { month, dayId, isSkipped } }: MutationSkipDayArgs): Promise<ScheduleModel> {
       await setSkippedDayStatus(month, dayId, isSkipped);
-      return generateSchedule(month);
+      return getSchedule(month);
     },
   },
   Schedule: {
