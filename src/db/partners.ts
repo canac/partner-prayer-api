@@ -5,5 +5,5 @@ import { PartnerModel } from './models';
 // eslint-disable-next-line import/prefer-default-export
 export async function getPartners(): Promise<PartnerModel[]> {
   const db = await getDb();
-  return db.collection<PartnerModel>('partners').find().sort({ lastName: 1, firstName: 1 }).toArray();
+  return db.collection<PartnerModel>('partner').find().sort({ lastName: 1, firstName: 1 }).toArray();
 }
