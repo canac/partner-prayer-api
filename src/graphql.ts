@@ -3,8 +3,9 @@ import { gql } from 'apollo-server';
 import { GraphQLDate } from 'graphql-iso-date';
 import { ObjectId, PartnerModel, ScheduleModel } from './db/models';
 import { getPartners } from './db/partners';
-import { completeDay, getSchedule, getScheduleDays } from './db/schedule';
-import { setSkippedDayStatus } from './db/skippedDays';
+import {
+  completeDay, getSchedule, getScheduleDays, setSkippedDayStatus,
+} from './db/schedule';
 import {
   MutationCompleteDayArgs, MutationSkipDayArgs, QueryScheduleArgs, Resolvers, ResolversTypes,
 } from './generated/graphql';

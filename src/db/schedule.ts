@@ -112,3 +112,29 @@ export async function completeDay(scheduleId: ObjectId, completedDays: number): 
   // Return the updated schedule
   return schedule;
 }
+
+// Update the skipped status of the given day
+export async function setSkippedDayStatus(scheduleId: ObjectId, dayId: number, isSkipped: boolean):
+  Promise<ScheduleModel> {
+  const db = await getDb();
+
+  // Make sure the schedule exists before doing anything
+  const schedule = await db.collection<ScheduleModel>('schedule').findOne({ _id: scheduleId });
+  if (!schedule) {
+    throw new Error('Schedule does not exist');
+  }
+
+  // Update the schedule day
+  const { modifiedCount } = await db.collection<ScheduleDayModel>('scheduleDay').updateOne(
+    { scheduleId, dayId },
+    { $set: { isSkipped } },
+  );
+  if (modifiedCount === 0) {
+    throw new Error('Schedule day does not exist');
+  }
+
+  await updateScheduleDays(schedule);
+
+  // Return the referenced schedule
+  return schedule;
+}
