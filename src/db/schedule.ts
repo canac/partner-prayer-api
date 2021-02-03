@@ -95,16 +95,20 @@ export async function getSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
 }
 
 // Mark the specified day as completed
-export async function completeDay(month: Date, completedDays: number): Promise<void> {
+export async function completeDay(scheduleId: ObjectId, completedDays: number): Promise<ScheduleModel> {
   const db = await getDb();
-  await db.collection<ScheduleModel>('schedule').updateOne(
-    { month: startOfMonth(month) },
-    { $set: { completedDays } },
-  );
 
-  const schedule = await db.collection<ScheduleModel>('schedule').findOne({ month });
+  const { value: schedule } = await db.collection<ScheduleModel>('schedule').findOneAndUpdate(
+    { _id: scheduleId },
+    { $set: { completedDays } },
+    { returnOriginal: false },
+  );
   if (!schedule) {
     throw new Error('Schedule does not exist');
   }
+
   await updateScheduleDays(schedule);
+
+  // Return the updated schedule
+  return schedule;
 }

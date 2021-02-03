@@ -60,12 +60,12 @@ export type QueryScheduleArgs = {
 };
 
 export type CompleteDayInput = {
-  month: Scalars['Date'];
+  scheduleId: Scalars['String'];
   completedDays: Scalars['Int'];
 };
 
 export type SkipDayInput = {
-  month: Scalars['Date'];
+  scheduleId: Scalars['String'];
   dayId: Scalars['Int'];
   isSkipped: Scalars['Boolean'];
 };

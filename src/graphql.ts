@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { gql } from 'apollo-server';
 import { GraphQLDate } from 'graphql-iso-date';
-import { PartnerModel, ScheduleModel } from './db/models';
+import { ObjectId, PartnerModel, ScheduleModel } from './db/models';
 import { getPartners } from './db/partners';
 import { completeDay, getSchedule, getScheduleDays } from './db/schedule';
 import { setSkippedDayStatus } from './db/skippedDays';
@@ -16,15 +16,12 @@ const typeDefs = gql(readFileSync('schema.graphql', 'utf8'));
 const resolvers: Resolvers = {
   Date: GraphQLDate,
   Mutation: {
-    async completeDay(_: unknown, { input: { month, completedDays } }: MutationCompleteDayArgs):
-      Promise<ScheduleModel> {
-      await completeDay(month, completedDays);
-      return getSchedule(month);
+    completeDay(_: unknown, { input: { scheduleId, completedDays } }: MutationCompleteDayArgs): Promise<ScheduleModel> {
+      return completeDay(new ObjectId(scheduleId), completedDays);
     },
 
-    async skipDay(_: unknown, { input: { month, dayId, isSkipped } }: MutationSkipDayArgs): Promise<ScheduleModel> {
-      await setSkippedDayStatus(month, dayId, isSkipped);
-      return getSchedule(month);
+    skipDay(_: unknown, { input: { scheduleId, dayId, isSkipped } }: MutationSkipDayArgs): Promise<ScheduleModel> {
+      return setSkippedDayStatus(new ObjectId(scheduleId), dayId, isSkipped);
     },
   },
   Schedule: {

@@ -27,12 +27,12 @@ type Query {
 }
 
 input CompleteDayInput {
-  month: Date!
+  scheduleId: String!
   completedDays: Int!
 }
 
 input SkipDayInput {
-  month: Date!
+  scheduleId: String!
   dayId: Int!
   isSkipped: Boolean!
 }
