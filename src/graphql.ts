@@ -4,7 +4,7 @@ import { GraphQLDate } from 'graphql-iso-date';
 import { ObjectId, PartnerModel, ScheduleModel } from './db/models';
 import { getPartners } from './db/partners';
 import {
-  completeDay, getSchedule, getScheduleDays, setSkippedDayStatus,
+  completeDay, getOrCreateSchedule, getScheduleDays, setSkippedDayStatus,
 } from './db/schedule';
 import {
   MutationCompleteDayArgs, MutationSkipDayArgs, QueryScheduleArgs, Resolvers, ResolversTypes,
@@ -51,7 +51,7 @@ const resolvers: Resolvers = {
     },
 
     async schedule(_: unknown, { month }: QueryScheduleArgs): Promise<ScheduleModel> {
-      return getSchedule(month);
+      return getOrCreateSchedule(month);
     },
   },
 };

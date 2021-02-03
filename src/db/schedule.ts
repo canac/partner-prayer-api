@@ -38,7 +38,6 @@ export async function updateScheduleDays(schedule: ScheduleModel): Promise<void>
   const remainderPartners: number = incompletePartners.length % numDays;
 
   let numDistributedPartners = 0;
-
   // eslint-disable-next-line no-restricted-syntax
   for await (const [index, day] of scheduleDays.entries()) {
     // Assign partnersPerDay to each day and give the remaining partners to the earlier days
@@ -52,6 +51,7 @@ export async function updateScheduleDays(schedule: ScheduleModel): Promise<void>
     );
   }
 
+  // Incomplete skipped days receive no partners
   await db.collection<ScheduleDayModel>('scheduleDay').updateMany(
     { scheduleId: schedule._id, dayId: { $gte: schedule.completedDays }, isSkipped: true },
     { $set: { partners: [] } },
@@ -76,6 +76,7 @@ async function createSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
       scheduleId: insertedId,
       dayId,
       partners: [],
+      // Weekends are initially skipped
       isSkipped: isWeekend,
     };
   }));
@@ -87,8 +88,8 @@ async function createSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
   return schedule;
 }
 
-// Return the schedule for the specified month
-export async function getSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
+// Return the schedule for the specified month, creating it if necessary
+export async function getOrCreateSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
   const month = startOfMonth(dirtyMonth);
   const db = await getDb();
   return await db.collection<ScheduleModel>('schedule').findOne({ month }) || createSchedule(month);
@@ -98,6 +99,7 @@ export async function getSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
 export async function completeDay(scheduleId: ObjectId, completedDays: number): Promise<ScheduleModel> {
   const db = await getDb();
 
+  // Set the schedule's number of completed days
   const { value: schedule } = await db.collection<ScheduleModel>('schedule').findOneAndUpdate(
     { _id: scheduleId },
     { $set: { completedDays } },
