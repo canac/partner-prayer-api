@@ -1,2 +1,4 @@
 export { ObjectId } from 'mongodb';
-export { PartnerModel, ScheduleDayModel, ScheduleModel } from '../generated/graphql';
+export {
+  PartnerModel, PartnerRequestModel, ScheduleDayModel, ScheduleModel,
+} from '../generated/graphql';

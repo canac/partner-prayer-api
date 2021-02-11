@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { gql } from 'apollo-server';
 import { GraphQLDate } from 'graphql-iso-date';
 import { ObjectId, PartnerModel, ScheduleModel } from './db/models';
-import { getPartners } from './db/partners';
+import { getPartnerRequests, getPartners } from './db/partners';
 import {
   completeDay, getOrCreateSchedule, getScheduleDays, setSkippedDayStatus,
 } from './db/schedule';
@@ -23,6 +23,16 @@ const resolvers: Resolvers = {
 
     skipDay(_: unknown, { input: { scheduleId, dayId, isSkipped } }: MutationSkipDayArgs): Promise<ScheduleModel> {
       return setSkippedDayStatus(new ObjectId(scheduleId), dayId, isSkipped);
+    },
+  },
+  Partner: {
+    async requests(partner: PartnerModel): Promise<ResolversTypes['PartnerRequest'][]> {
+      const partnerRequests = await getPartnerRequests(partner._id);
+      return partnerRequests.map((partnerRequest) => ({
+        ...partnerRequest,
+        _id: partnerRequest._id.toHexString(),
+        partner,
+      }));
     },
   },
   Schedule: {

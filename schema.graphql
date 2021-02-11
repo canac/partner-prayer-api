@@ -1,9 +1,17 @@
 scalar Date
 
+type PartnerRequest @entity {
+  _id: ID! @id
+  partner: Partner! @link @map(path: "partnerId")
+  createdAt: Date! @column
+  request: String! @column
+}
+
 type Partner @entity {
   _id: ID! @id
   firstName: String! @column
   lastName: String! @column
+  requests: [PartnerRequest!]!
 }
 
 type ScheduleDay @entity {

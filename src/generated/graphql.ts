@@ -24,11 +24,20 @@ export type Scalars = {
 
 
 
+export type PartnerRequest = {
+  __typename?: 'PartnerRequest';
+  _id: Scalars['ID'];
+  partner: Partner;
+  createdAt: Scalars['Date'];
+  request: Scalars['String'];
+};
+
 export type Partner = {
   __typename?: 'Partner';
   _id: Scalars['ID'];
   firstName: Scalars['String'];
   lastName: Scalars['String'];
+  requests: Array<PartnerRequest>;
 };
 
 export type ScheduleDay = {
@@ -92,6 +101,13 @@ export type AdditionalEntityFields = {
 };
 
 import { ObjectID } from 'mongodb';
+export type PartnerRequestModel = {
+  _id: ObjectID,
+  partnerId: PartnerModel['_id'],
+  createdAt: Date,
+  request: string,
+};
+
 export type PartnerModel = {
   _id: ObjectID,
   firstName: string,
@@ -192,9 +208,10 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Date: ResolverTypeWrapper<Scalars['Date']>;
-  Partner: ResolverTypeWrapper<PartnerModel>;
+  PartnerRequest: ResolverTypeWrapper<Omit<PartnerRequest, 'partner'> & { partner: ResolversTypes['Partner'] }>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Partner: ResolverTypeWrapper<PartnerModel>;
   ScheduleDay: ResolverTypeWrapper<Omit<ScheduleDay, 'schedule' | 'partners'> & { schedule: ResolversTypes['Schedule'], partners: Array<ResolversTypes['Partner']> }>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
@@ -209,9 +226,10 @@ export type ResolversTypes = ResolversObject<{
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Date: Scalars['Date'];
-  Partner: PartnerModel;
+  PartnerRequest: Omit<PartnerRequest, 'partner'> & { partner: ResolversParentTypes['Partner'] };
   ID: Scalars['ID'];
   String: Scalars['String'];
+  Partner: PartnerModel;
   ScheduleDay: Omit<ScheduleDay, 'schedule' | 'partners'> & { schedule: ResolversParentTypes['Schedule'], partners: Array<ResolversParentTypes['Partner']> };
   Int: Scalars['Int'];
   Boolean: Scalars['Boolean'];
@@ -262,10 +280,19 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'Date';
 }
 
+export type PartnerRequestResolvers<ContextType = any, ParentType extends ResolversParentTypes['PartnerRequest'] = ResolversParentTypes['PartnerRequest']> = ResolversObject<{
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  partner?: Resolver<ResolversTypes['Partner'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  request?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type PartnerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Partner'] = ResolversParentTypes['Partner']> = ResolversObject<{
   _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   firstName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   lastName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  requests?: Resolver<Array<ResolversTypes['PartnerRequest']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -298,6 +325,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type Resolvers<ContextType = any> = ResolversObject<{
   Date?: GraphQLScalarType;
+  PartnerRequest?: PartnerRequestResolvers<ContextType>;
   Partner?: PartnerResolvers<ContextType>;
   ScheduleDay?: ScheduleDayResolvers<ContextType>;
   Schedule?: ScheduleResolvers<ContextType>;
