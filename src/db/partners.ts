@@ -1,5 +1,6 @@
+import { ObjectId } from 'mongodb';
+import { PartnerModel, PartnerRequestModel } from '../generated/graphql';
 import { getCollection } from './db';
-import { ObjectId, PartnerModel, PartnerRequestModel } from './models';
 
 // Return an array of all the partners
 export async function getPartners(): Promise<PartnerModel[]> {

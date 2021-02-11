@@ -1,7 +1,8 @@
 import { range } from 'lodash';
+import { ObjectId } from 'mongodb';
 import { endOfMonth, startOfMonth } from '../date-fns-utc';
+import { ScheduleDayModel, ScheduleModel } from '../generated/graphql';
 import { getCollection, getDb } from './db';
-import { ObjectId, ScheduleDayModel, ScheduleModel } from './models';
 import { getPartners } from './partners';
 
 // Return the days for the specified schedule

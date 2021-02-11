@@ -1,7 +1,7 @@
 import { Collection, Db, MongoClient } from 'mongodb';
 import {
   PartnerModel, PartnerRequestModel, ScheduleDayModel, ScheduleModel,
-} from './models';
+} from '../generated/graphql';
 
 let db: Db | null = null;
 

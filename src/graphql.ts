@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { gql } from 'apollo-server';
 import { GraphQLDate } from 'graphql-iso-date';
-import { ObjectId, PartnerModel, ScheduleModel } from './db/models';
+import { ObjectId } from 'mongodb';
 import {
   createPartnerRequest, deletePartnerRequest, getPartner, getPartnerRequests, getPartners,
 } from './db/partners';
@@ -11,7 +11,8 @@ import {
 import {
   DeletePartnerRequestPayload,
   MutationCompleteDayArgs, MutationCreatePartnerRequestArgs, MutationDeletePartnerRequestArgs, MutationSkipDayArgs,
-  QueryScheduleArgs, Resolvers, ResolversTypes,
+  PartnerModel, QueryScheduleArgs,
+  Resolvers, ResolversTypes, ScheduleModel,
 } from './generated/graphql';
 
 // Construct the GraphQL schema
