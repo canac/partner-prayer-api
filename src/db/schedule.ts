@@ -1,13 +1,12 @@
 import { range } from 'lodash';
 import { endOfMonth, startOfMonth } from '../date-fns-utc';
-import { getDb } from './db';
+import { getCollection, getDb } from './db';
 import { ObjectId, ScheduleDayModel, ScheduleModel } from './models';
 import { getPartners } from './partners';
 
 // Return the days for the specified schedule
 export async function getScheduleDays(scheduleId: ObjectId): Promise<ScheduleDayModel[]> {
-  const db = await getDb();
-  return db.collection<ScheduleDayModel>('scheduleDay').find({ scheduleId }).toArray();
+  return (await getCollection('scheduleDay')).find({ scheduleId }).toArray();
 }
 
 // Calculate the days in the prayer partner schedule for the specified month
@@ -19,7 +18,7 @@ export async function updateScheduleDays(schedule: ScheduleModel): Promise<void>
   const partnerIds = partners.map(({ _id }) => _id);
 
   // Find the days that are unskipped and incomplete
-  const scheduleDays = await db.collection<ScheduleDayModel>('scheduleDay').find({
+  const scheduleDays = await (await getCollection('scheduleDay')).find({
     scheduleId: schedule._id, isSkipped: false, dayId: { $gte: schedule.completedDays },
   }).toArray();
 
@@ -45,14 +44,14 @@ export async function updateScheduleDays(schedule: ScheduleModel): Promise<void>
     const endIndex = numDistributedPartners + partnersPerDay + (index < remainderPartners ? 1 : 0);
     numDistributedPartners = endIndex;
 
-    await db.collection<ScheduleDayModel>('scheduleDay').updateOne(
+    await (await getCollection('scheduleDay')).updateOne(
       { scheduleId: schedule._id, dayId: day.dayId },
       { $set: { partners: incompletePartners.slice(startIndex, endIndex) } },
     );
   }
 
   // Incomplete skipped days receive no partners
-  await db.collection<ScheduleDayModel>('scheduleDay').updateMany(
+  await (await getCollection('scheduleDay')).updateMany(
     { scheduleId: schedule._id, dayId: { $gte: schedule.completedDays }, isSkipped: true },
     { $set: { partners: [] } },
   );
@@ -61,16 +60,15 @@ export async function updateScheduleDays(schedule: ScheduleModel): Promise<void>
 // Create a new schedule for the specified month
 async function createSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
   const month = startOfMonth(dirtyMonth);
-  const db = await getDb();
 
   // Create the schedule
   const scheduleFields = { month, completedDays: 0 };
-  const { insertedId } = await db.collection<ScheduleModel>('schedule').insertOne(scheduleFields);
+  const { insertedId } = await (await getCollection('schedule')).insertOne(scheduleFields);
 
   // Create the schedule days
   const numDaysInMonth = endOfMonth(month).getUTCDate();
   const firstDayOfMonth = month.getUTCDay();
-  await db.collection<ScheduleDayModel>('scheduleDay').insertMany(range(numDaysInMonth).map((dayId) => {
+  await (await getCollection('scheduleDay')).insertMany(range(numDaysInMonth).map((dayId) => {
     const isWeekend = [0, 6].includes((dayId + firstDayOfMonth) % 7);
     return {
       scheduleId: insertedId,
@@ -91,16 +89,13 @@ async function createSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
 // Return the schedule for the specified month, creating it if necessary
 export async function getOrCreateSchedule(dirtyMonth: Date): Promise<ScheduleModel> {
   const month = startOfMonth(dirtyMonth);
-  const db = await getDb();
-  return await db.collection<ScheduleModel>('schedule').findOne({ month }) || createSchedule(month);
+  return await (await getCollection('schedule')).findOne({ month }) || createSchedule(month);
 }
 
 // Mark the specified day as completed
 export async function completeDay(scheduleId: ObjectId, completedDays: number): Promise<ScheduleModel> {
-  const db = await getDb();
-
   // Set the schedule's number of completed days
-  const { value: schedule } = await db.collection<ScheduleModel>('schedule').findOneAndUpdate(
+  const { value: schedule } = await (await getCollection('schedule')).findOneAndUpdate(
     { _id: scheduleId },
     { $set: { completedDays } },
     { returnOriginal: false },
@@ -118,16 +113,14 @@ export async function completeDay(scheduleId: ObjectId, completedDays: number): 
 // Update the skipped status of the given day
 export async function setSkippedDayStatus(scheduleId: ObjectId, dayId: number, isSkipped: boolean):
   Promise<ScheduleModel> {
-  const db = await getDb();
-
   // Make sure the schedule exists before doing anything
-  const schedule = await db.collection<ScheduleModel>('schedule').findOne({ _id: scheduleId });
+  const schedule = await (await getCollection('schedule')).findOne({ _id: scheduleId });
   if (!schedule) {
     throw new Error('Schedule does not exist');
   }
 
   // Update the schedule day
-  const { modifiedCount } = await db.collection<ScheduleDayModel>('scheduleDay').updateOne(
+  const { modifiedCount } = await (await getCollection('scheduleDay')).updateOne(
     { scheduleId, dayId },
     { $set: { isSkipped } },
   );

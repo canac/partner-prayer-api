@@ -1,4 +1,7 @@
-import { Db, MongoClient } from 'mongodb';
+import { Collection, Db, MongoClient } from 'mongodb';
+import {
+  PartnerModel, PartnerRequestModel, ScheduleDayModel, ScheduleModel,
+} from './models';
 
 let db: Db | null = null;
 
@@ -9,7 +12,13 @@ const {
   DB_PASS: password,
 } = process.env;
 
-// eslint-disable-next-line import/prefer-default-export
+interface CollectionTypes {
+  partner: PartnerModel,
+  partnerRequest: PartnerRequestModel,
+  schedule: ScheduleModel,
+  scheduleDay: ScheduleDayModel,
+}
+
 export async function getDb(): Promise<Db> {
   if (db) {
     return db;
@@ -33,4 +42,9 @@ export async function getDb(): Promise<Db> {
   await client.connect();
   db = client.db('partnerPrayer');
   return db;
+}
+
+export async function getCollection<Name extends keyof CollectionTypes>(collectionName: Name):
+  Promise<Collection<CollectionTypes[Name]>> {
+  return (await getDb()).collection(collectionName);
 }
