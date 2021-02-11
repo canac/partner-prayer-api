@@ -26,7 +26,7 @@ const resolvers: Resolvers = {
     },
   },
   Schedule: {
-    async days(schedule: ScheduleModel): Promise<Array<ResolversTypes['ScheduleDay']>> {
+    async days(schedule: ScheduleModel): Promise<ResolversTypes['ScheduleDay'][]> {
       const allPartners = await getPartners();
 
       // Index the partners by their id
