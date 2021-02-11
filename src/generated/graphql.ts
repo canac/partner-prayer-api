@@ -68,6 +68,20 @@ export type QueryScheduleArgs = {
   month: Scalars['Date'];
 };
 
+export type CreatePartnerRequestInput = {
+  partnerId: Scalars['String'];
+  request: Scalars['String'];
+};
+
+export type DeletePartnerRequestInput = {
+  partnerRequestId: Scalars['String'];
+};
+
+export type DeletePartnerRequestPayload = {
+  __typename?: 'DeletePartnerRequestPayload';
+  partnerRequestId: Scalars['String'];
+};
+
 export type CompleteDayInput = {
   scheduleId: Scalars['String'];
   completedDays: Scalars['Int'];
@@ -81,8 +95,20 @@ export type SkipDayInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createPartnerRequest: PartnerRequest;
+  deletePartnerRequest: DeletePartnerRequestPayload;
   completeDay?: Maybe<Schedule>;
   skipDay?: Maybe<Schedule>;
+};
+
+
+export type MutationCreatePartnerRequestArgs = {
+  input: CreatePartnerRequestInput;
+};
+
+
+export type MutationDeletePartnerRequestArgs = {
+  input: DeletePartnerRequestInput;
 };
 
 
@@ -217,6 +243,9 @@ export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Schedule: ResolverTypeWrapper<ScheduleModel>;
   Query: ResolverTypeWrapper<{}>;
+  CreatePartnerRequestInput: CreatePartnerRequestInput;
+  DeletePartnerRequestInput: DeletePartnerRequestInput;
+  DeletePartnerRequestPayload: ResolverTypeWrapper<DeletePartnerRequestPayload>;
   CompleteDayInput: CompleteDayInput;
   SkipDayInput: SkipDayInput;
   Mutation: ResolverTypeWrapper<{}>;
@@ -235,6 +264,9 @@ export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean'];
   Schedule: ScheduleModel;
   Query: {};
+  CreatePartnerRequestInput: CreatePartnerRequestInput;
+  DeletePartnerRequestInput: DeletePartnerRequestInput;
+  DeletePartnerRequestPayload: DeletePartnerRequestPayload;
   CompleteDayInput: CompleteDayInput;
   SkipDayInput: SkipDayInput;
   Mutation: {};
@@ -318,7 +350,14 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   schedule?: Resolver<Maybe<ResolversTypes['Schedule']>, ParentType, ContextType, RequireFields<QueryScheduleArgs, 'month'>>;
 }>;
 
+export type DeletePartnerRequestPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['DeletePartnerRequestPayload'] = ResolversParentTypes['DeletePartnerRequestPayload']> = ResolversObject<{
+  partnerRequestId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  createPartnerRequest?: Resolver<ResolversTypes['PartnerRequest'], ParentType, ContextType, RequireFields<MutationCreatePartnerRequestArgs, 'input'>>;
+  deletePartnerRequest?: Resolver<ResolversTypes['DeletePartnerRequestPayload'], ParentType, ContextType, RequireFields<MutationDeletePartnerRequestArgs, 'input'>>;
   completeDay?: Resolver<Maybe<ResolversTypes['Schedule']>, ParentType, ContextType, RequireFields<MutationCompleteDayArgs, 'input'>>;
   skipDay?: Resolver<Maybe<ResolversTypes['Schedule']>, ParentType, ContextType, RequireFields<MutationSkipDayArgs, 'input'>>;
 }>;
@@ -330,6 +369,7 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   ScheduleDay?: ScheduleDayResolvers<ContextType>;
   Schedule?: ScheduleResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  DeletePartnerRequestPayload?: DeletePartnerRequestPayloadResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
 }>;
 

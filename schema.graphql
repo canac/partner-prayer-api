@@ -34,6 +34,18 @@ type Query {
   schedule(month: Date!): Schedule
 }
 
+input CreatePartnerRequestInput {
+  partnerId: String!
+  request: String!
+}
+
+input DeletePartnerRequestInput {
+  partnerRequestId: String!
+}
+type DeletePartnerRequestPayload {
+  partnerRequestId: String!
+}
+
 input CompleteDayInput {
   scheduleId: String!
   completedDays: Int!
@@ -46,6 +58,9 @@ input SkipDayInput {
 }
 
 type Mutation {
+  createPartnerRequest(input: CreatePartnerRequestInput!): PartnerRequest!
+  deletePartnerRequest(input: DeletePartnerRequestInput!): DeletePartnerRequestPayload!
+
   completeDay(input: CompleteDayInput!): Schedule
   skipDay(input: SkipDayInput!): Schedule
 }
