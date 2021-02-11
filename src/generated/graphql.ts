@@ -59,8 +59,8 @@ export type Schedule = {
 
 export type Query = {
   __typename?: 'Query';
-  partners?: Maybe<Array<Maybe<Partner>>>;
-  schedule?: Maybe<Schedule>;
+  partners: Array<Partner>;
+  schedule: Schedule;
 };
 
 
@@ -97,8 +97,8 @@ export type Mutation = {
   __typename?: 'Mutation';
   createPartnerRequest: PartnerRequest;
   deletePartnerRequest: DeletePartnerRequestPayload;
-  completeDay?: Maybe<Schedule>;
-  skipDay?: Maybe<Schedule>;
+  completeDay: Schedule;
+  skipDay: Schedule;
 };
 
 
@@ -346,8 +346,8 @@ export type ScheduleResolvers<ContextType = any, ParentType extends ResolversPar
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  partners?: Resolver<Maybe<Array<Maybe<ResolversTypes['Partner']>>>, ParentType, ContextType>;
-  schedule?: Resolver<Maybe<ResolversTypes['Schedule']>, ParentType, ContextType, RequireFields<QueryScheduleArgs, 'month'>>;
+  partners?: Resolver<Array<ResolversTypes['Partner']>, ParentType, ContextType>;
+  schedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<QueryScheduleArgs, 'month'>>;
 }>;
 
 export type DeletePartnerRequestPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['DeletePartnerRequestPayload'] = ResolversParentTypes['DeletePartnerRequestPayload']> = ResolversObject<{
@@ -358,8 +358,8 @@ export type DeletePartnerRequestPayloadResolvers<ContextType = any, ParentType e
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createPartnerRequest?: Resolver<ResolversTypes['PartnerRequest'], ParentType, ContextType, RequireFields<MutationCreatePartnerRequestArgs, 'input'>>;
   deletePartnerRequest?: Resolver<ResolversTypes['DeletePartnerRequestPayload'], ParentType, ContextType, RequireFields<MutationDeletePartnerRequestArgs, 'input'>>;
-  completeDay?: Resolver<Maybe<ResolversTypes['Schedule']>, ParentType, ContextType, RequireFields<MutationCompleteDayArgs, 'input'>>;
-  skipDay?: Resolver<Maybe<ResolversTypes['Schedule']>, ParentType, ContextType, RequireFields<MutationSkipDayArgs, 'input'>>;
+  completeDay?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationCompleteDayArgs, 'input'>>;
+  skipDay?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationSkipDayArgs, 'input'>>;
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{

@@ -30,8 +30,8 @@ type Schedule @entity {
 }
 
 type Query {
-  partners: [Partner]
-  schedule(month: Date!): Schedule
+  partners: [Partner!]!
+  schedule(month: Date!): Schedule!
 }
 
 input CreatePartnerRequestInput {
@@ -61,6 +61,6 @@ type Mutation {
   createPartnerRequest(input: CreatePartnerRequestInput!): PartnerRequest!
   deletePartnerRequest(input: DeletePartnerRequestInput!): DeletePartnerRequestPayload!
 
-  completeDay(input: CompleteDayInput!): Schedule
-  skipDay(input: SkipDayInput!): Schedule
+  completeDay(input: CompleteDayInput!): Schedule!
+  skipDay(input: SkipDayInput!): Schedule!
 }
