@@ -7,7 +7,7 @@ const server = new ApolloServer({
   typeDefs: [DIRECTIVES, typeDefs],
   resolvers,
   cors: {
-    origin: process.env.FRONTEND_ORIGIN,
+    origin: [process.env.FRONTEND_ORIGIN ?? '', 'https://studio.apollographql.com'],
     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
     methods: 'GET, POST, PUT, DELETE, OPTIONS',
   },
