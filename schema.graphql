@@ -11,6 +11,7 @@ type Partner @entity {
   _id: ID! @id
   firstName: String! @column
   lastName: String! @column
+  fullName: String!
   requests: [PartnerRequest!]!
 }
 

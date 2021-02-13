@@ -56,6 +56,10 @@ const resolvers: Resolvers = {
     },
   },
   Partner: {
+    fullName(partner: PartnerModel): string {
+      return `${partner.firstName} ${partner.lastName}`;
+    },
+
     async requests(partner: PartnerModel): Promise<ResolversTypes['PartnerRequest'][]> {
       const partnerRequests = await getPartnerRequests(partner._id);
       return partnerRequests.map((partnerRequest) => ({
