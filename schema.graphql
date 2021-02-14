@@ -31,6 +31,7 @@ type Schedule @entity {
 }
 
 type Query {
+  partner(id: ID!): Partner
   partners: [Partner!]!
   schedule(month: Date!): Schedule!
 }

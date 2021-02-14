@@ -60,8 +60,14 @@ export type Schedule = {
 
 export type Query = {
   __typename?: 'Query';
+  partner?: Maybe<Partner>;
   partners: Array<Partner>;
   schedule: Schedule;
+};
+
+
+export type QueryPartnerArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -348,6 +354,7 @@ export type ScheduleResolvers<ContextType = any, ParentType extends ResolversPar
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  partner?: Resolver<Maybe<ResolversTypes['Partner']>, ParentType, ContextType, RequireFields<QueryPartnerArgs, 'id'>>;
   partners?: Resolver<Array<ResolversTypes['Partner']>, ParentType, ContextType>;
   schedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<QueryScheduleArgs, 'month'>>;
 }>;

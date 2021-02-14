@@ -11,7 +11,7 @@ import {
 import {
   DeletePartnerRequestPayload,
   MutationCompleteDayArgs, MutationCreatePartnerRequestArgs, MutationDeletePartnerRequestArgs, MutationSkipDayArgs,
-  PartnerModel, QueryScheduleArgs,
+  PartnerModel, QueryPartnerArgs, QueryScheduleArgs,
   Resolvers, ResolversTypes, ScheduleModel,
 } from './generated/graphql';
 
@@ -90,6 +90,10 @@ const resolvers: Resolvers = {
     },
   },
   Query: {
+    async partner(_: unknown, { id }: QueryPartnerArgs): Promise<PartnerModel | null> {
+      return getPartner(new ObjectId(id));
+    },
+
     async partners(): Promise<PartnerModel[]> {
       return getPartners();
     },
