@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { gql } from 'apollo-server';
+import { gql } from 'apollo-server-lambda';
 import { GraphQLDate } from 'graphql-iso-date';
 import { ObjectId } from 'mongodb';
 import {
