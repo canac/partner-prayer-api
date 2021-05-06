@@ -5,6 +5,10 @@
   autoLaunch = false
   port = 8081
 
+[functions]
+  included_files = ["schema.graphql"]
+  node_bundler = "esbuild"
+
 [[redirects]]
   from = "/"
   to = "/.netlify/functions/graphql"
