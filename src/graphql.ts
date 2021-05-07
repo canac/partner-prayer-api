@@ -17,10 +17,11 @@ import {
 } from './generated/graphql';
 
 // Construct the GraphQL schema
-console.log(process.env);
-console.log(process.cwd());
-console.log(resolve(__dirname, '../../schema.graphql'));
-const typeDefs = gql(readFileSync('schema.graphql', 'utf8'));
+// Because Netlify builds serverless functions into a single bundle, __dirname here is based on the lambda/graphql.ts
+// file, not this one. Thus, this path is relative to lambda/graphql.ts, not this file. Therefore, we have to go up two
+// levels instead of one to find schema.graphql.
+const schemaPath = resolve(__dirname, '..', '..', 'schema.graphql');
+const typeDefs = gql(readFileSync(schemaPath, 'utf8'));
 
 // Provide resolver functions for the schema fields
 const resolvers: Resolvers = {
