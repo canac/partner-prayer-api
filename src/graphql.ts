@@ -20,7 +20,7 @@ import {
 console.log(process.env);
 console.log(process.cwd());
 console.log(resolve(__dirname, '../../schema.graphql'));
-const typeDefs = gql(readFileSync(resolve(__dirname, '../../schema.graphql'), 'utf8'));
+const typeDefs = gql(readFileSync('schema.graphql', 'utf8'));
 
 // Provide resolver functions for the schema fields
 const resolvers: Resolvers = {
