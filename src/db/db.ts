@@ -1,6 +1,9 @@
 import { Collection, Db, MongoClient } from 'mongodb';
 import {
-  PartnerModel, PartnerRequestModel, ScheduleDayModel, ScheduleModel,
+  PartnerModel,
+  PartnerRequestModel,
+  ScheduleDayModel,
+  ScheduleModel,
 } from '../generated/graphql';
 
 let db: Db | null = null;
@@ -13,10 +16,10 @@ const {
 } = process.env;
 
 interface CollectionTypes {
-  partner: PartnerModel,
-  partnerRequest: PartnerRequestModel,
-  schedule: ScheduleModel,
-  scheduleDay: ScheduleDayModel,
+  partner: PartnerModel;
+  partnerRequest: PartnerRequestModel;
+  schedule: ScheduleModel;
+  scheduleDay: ScheduleDayModel;
 }
 
 export async function getDb(): Promise<Db> {
@@ -25,7 +28,9 @@ export async function getDb(): Promise<Db> {
   }
 
   if ((user && !password) || (!user && password)) {
-    throw new Error('Database user and password must either both be specified or neither');
+    throw new Error(
+      'Database user and password must either both be specified or neither',
+    );
   }
 
   if (!protocol) {
@@ -38,13 +43,17 @@ export async function getDb(): Promise<Db> {
 
   const auth = user && password ? `${user}:${password}@` : '';
   const uri = `${protocol}://${auth}${host}/partnerPrayer?retryWrites=true&w=majority`;
-  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  const client = new MongoClient(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
   await client.connect();
   db = client.db('partnerPrayer');
   return db;
 }
 
-export async function getCollection<Name extends keyof CollectionTypes>(collectionName: Name):
-  Promise<Collection<CollectionTypes[Name]>> {
+export async function getCollection<Name extends keyof CollectionTypes>(
+  collectionName: Name,
+): Promise<Collection<CollectionTypes[Name]>> {
   return (await getDb()).collection(collectionName);
 }
