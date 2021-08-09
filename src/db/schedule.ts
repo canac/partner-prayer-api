@@ -9,7 +9,10 @@ import { getPartners } from './partners';
 export async function getScheduleDays(
   scheduleId: ObjectId,
 ): Promise<ScheduleDayModel[]> {
-  return (await getCollection('scheduleDay')).find({ scheduleId }).toArray();
+  return (await getCollection('scheduleDay'))
+    .find({ scheduleId })
+    .sort({ dayId: 1 })
+    .toArray();
 }
 
 // Calculate the days in the prayer partner schedule for the specified month
@@ -31,6 +34,7 @@ export async function updateScheduleDays(
       isSkipped: false,
       dayId: { $gte: schedule.completedDays },
     })
+    .sort({ dayId: 1 })
     .toArray();
 
   // Count the number of partners that have already been completed because they are assigned to completed days
